@@ -1,37 +1,40 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
-	"route256/libs/jsonreqwrap"
+	loms_client "route256/checkout/internal/clients/loms"
+	products_client "route256/checkout/internal/clients/products"
+	"route256/checkout/internal/config"
+	addtocart "route256/checkout/internal/controllers/add_to_cart"
+	deletfromcart "route256/checkout/internal/controllers/delete_from_cart"
+	listcart "route256/checkout/internal/controllers/list_cart"
+	"route256/checkout/internal/controllers/purchase"
+	"route256/checkout/internal/domain"
+	"route256/libs/jsonhandlerwrap"
 )
 
-// const port = ":8080"
-
-const HACKER_NEWS_URL = "https://hacker-news.firebaseio.com/v0/item/8863.json?print=pretty"
-
-type HackerNewsReq struct{}
-type HackerNewsRes struct {
-	By          string  `json:"by"`
-	Descendants int64   `json:"descendants"`
-	ID          int64   `json:"id"`
-	Kids        []int64 `json:"kids"`
-	Score       int64   `json:"score"`
-	Time        int64   `json:"time"`
-	Title       string  `json:"title"`
-	Type        string  `json:"type"`
-	URL         string  `json:"url"`
-}
+const PORT = ":8080"
 
 func main() {
-	client := jsonreqwrap.NewClient[HackerNewsReq, HackerNewsRes](HACKER_NEWS_URL, http.MethodGet)
+	config.Init()
 
-	res, err := client.Run(HackerNewsReq{})
+	lomsClient := loms_client.New()
+	productClient := products_client.New()
 
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	businessLogic := domain.New(lomsClient, productClient)
 
-	fmt.Printf("%+v\n", res)
+	addToCartHandler := addtocart.New(businessLogic)
+	deleteFromCartHandler := deletfromcart.New(businessLogic)
+	purchaseHandler := purchase.New(businessLogic)
+	listHandler := listcart.New(businessLogic)
+
+	http.Handle("/addToCart", jsonhandlerwrap.New(addToCartHandler.Handle))
+	http.Handle("/deleteFromCart", jsonhandlerwrap.New(deleteFromCartHandler.Handle))
+	http.Handle("/purchase", jsonhandlerwrap.New(purchaseHandler.Handle))
+	http.Handle("/listCart", jsonhandlerwrap.New(listHandler.Handle))
+
+	log.Println("listening http at", PORT)
+	err := http.ListenAndServe(PORT, nil)
+	log.Fatal("cannot listen http", err)
 }

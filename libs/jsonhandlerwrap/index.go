@@ -1,4 +1,4 @@
-package srvwrapper
+package jsonhandlerwrap
 
 import (
 	"bytes"
