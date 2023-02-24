@@ -3,6 +3,7 @@ package jsonhandlerwrap
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -31,6 +32,8 @@ func (w *Wrapper[Req, Res]) ServeHTTP(resWriter http.ResponseWriter, httpReq *ht
 		writeErrorText(resWriter, "decoding JSON", err)
 		return
 	}
+
+	fmt.Printf("%s [%s]: %+v\n", httpReq.Method, httpReq.RequestURI, request)
 
 	err = request.Validate()
 	if err != nil {

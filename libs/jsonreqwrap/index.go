@@ -2,8 +2,10 @@ package jsonreqwrap
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/pkg/errors"
 )
@@ -26,7 +28,9 @@ func (client *HttpJsonClient[Req, Res]) Run(body Req) (*Res, error) {
 		return nil, errors.Wrap(err, "encoding to json")
 	}
 
-	req, err := http.NewRequest(client.Method, client.Url, bytes.NewBuffer(rawJson))
+	ctx, _ := context.WithTimeout(context.Background(), time.Second*2)
+
+	req, err := http.NewRequestWithContext(ctx, client.Method, client.Url, bytes.NewBuffer(rawJson))
 	if err != nil {
 		return nil, errors.Wrap(err, "creating request")
 	}
