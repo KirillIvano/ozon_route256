@@ -17,7 +17,10 @@ import (
 const PORT = ":8080"
 
 func main() {
-	config.Init()
+	err := config.Init()
+	if err != nil {
+		log.Fatal("config init failed")
+	}
 
 	lomsClient := loms_client.New()
 	productClient := products_client.New()
@@ -35,6 +38,6 @@ func main() {
 	http.Handle("/listCart", jsonhandlerwrap.New(listHandler.Handle))
 
 	log.Println("listening http at", PORT)
-	err := http.ListenAndServe(PORT, nil)
+	err = http.ListenAndServe(PORT, nil)
 	log.Fatal("cannot listen http", err)
 }

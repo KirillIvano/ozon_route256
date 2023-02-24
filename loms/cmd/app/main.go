@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 	"route256/libs/jsonhandlerwrap"
-	"route256/loms/internal/config"
 	cancelorder "route256/loms/internal/controllers/cancel_order"
 	createorder "route256/loms/internal/controllers/create_order"
 	listorder "route256/loms/internal/controllers/list_order"
@@ -16,8 +15,6 @@ import (
 const PORT = ":8081"
 
 func main() {
-	config.Init()
-
 	domain := domain.New()
 
 	createOrderHandler := createorder.New(domain)

@@ -10,6 +10,6 @@ type Client struct {
 func New() *Client {
 	return &Client{
 		urlStocks:      config.ConfigData.Services.Loms + "/stocks",
-		urlCreateOrder: config.ConfigData.Services.Loms + "/creatOrder",
+		urlCreateOrder: config.ConfigData.Services.Loms + "/createOrder",
 	}
 }

@@ -25,7 +25,19 @@ func (c *Client) CreateOrder(user uint64, items []domain.CartItem) (uint64, erro
 		c.urlCreateOrder,
 		http.MethodPost,
 	)
-	requestData := CreateOrderRequestBody{}
+
+	createOrderItems := make([]CreateOrderItem, len(items))
+	for idx, item := range items {
+		createOrderItems[idx] = CreateOrderItem{
+			Sku:   item.Sku,
+			Count: item.Count,
+		}
+	}
+
+	requestData := CreateOrderRequestBody{
+		User:  user,
+		Items: createOrderItems,
+	}
 
 	response, err := reqClient.Run(requestData)
 

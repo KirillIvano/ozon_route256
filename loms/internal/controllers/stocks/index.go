@@ -50,7 +50,10 @@ func (h *Handler) Handle(req Request) (Response, error) {
 
 	responseStocks := make([]ResponseStock, len(stocks))
 	for idx, item := range stocks {
-		responseStocks[idx] = ResponseStock(item)
+		responseStocks[idx] = ResponseStock{
+			WarehouseID: item.WarehouseID,
+			Count:       item.Count,
+		}
 	}
 
 	return Response{
