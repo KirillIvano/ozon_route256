@@ -9,7 +9,7 @@ type ListCartResponse struct {
 	TotalPrice uint32
 }
 
-func (m *Model) ListCart(user uint32) (ListCartResponse, error) {
+func (m *CheckoutDomain) ListCart(user uint32) (ListCartResponse, error) {
 	itemsMock := []CartItem{
 		{
 			UserId: 2,

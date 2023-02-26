@@ -4,9 +4,9 @@ type Validator interface {
 	Validate() error
 }
 
-type Model struct {
+type LomsDomain struct {
 }
 
-func New() *Model {
-	return &Model{}
+func New() *LomsDomain {
+	return &LomsDomain{}
 }

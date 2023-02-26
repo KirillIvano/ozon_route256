@@ -1,3 +1,0 @@
-curl http://127.0.0.1:8081/stocks -i -d '{
-"sku": 1
-}'

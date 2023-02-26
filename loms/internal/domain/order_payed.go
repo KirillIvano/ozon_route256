@@ -1,6 +1,6 @@
 package domain
 
-func (m *Model) SetOrderPayed(orderId int64) error {
+func (m *LomsDomain) SetOrderPayed(orderId int64) error {
 
 	// TODO ходим в базку, ставим статус
 

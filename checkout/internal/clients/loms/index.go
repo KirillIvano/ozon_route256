@@ -1,15 +1,13 @@
 package loms_client
 
-import "route256/checkout/internal/config"
-
 type Client struct {
 	urlStocks      string
 	urlCreateOrder string
 }
 
-func New() *Client {
+func New(urlOrigin string) *Client {
 	return &Client{
-		urlStocks:      config.ConfigData.Services.Loms + "/stocks",
-		urlCreateOrder: config.ConfigData.Services.Loms + "/createOrder",
+		urlStocks:      urlOrigin + "/stocks",
+		urlCreateOrder: urlOrigin + "/createOrder",
 	}
 }

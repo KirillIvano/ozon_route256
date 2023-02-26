@@ -1,6 +1,6 @@
 package domain
 
-func (m *Model) ListOrder(orderId int64) (OrderInfo, error) {
+func (m *LomsDomain) ListOrder(orderId int64) (OrderInfo, error) {
 
 	return OrderInfo{
 		Items: []OrderItem{

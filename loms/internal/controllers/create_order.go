@@ -1,4 +1,4 @@
-package createorder
+package controllers
 
 import (
 	"route256/loms/internal/domain"
@@ -6,11 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-type Handler struct {
-	businessLogic *domain.Model
-}
-
-type Request struct {
+type CreateOrderRequest struct {
 	User  int64 `json:"user"`
 	Items []struct {
 		Sku   uint32 `json:"sku"`
@@ -22,7 +18,7 @@ var (
 	ErrEmptyUser = errors.New("empty user")
 )
 
-func (r Request) Validate() error {
+func (r CreateOrderRequest) Validate() error {
 	if r.User == 0 {
 		return ErrEmptyUser
 	}
@@ -30,17 +26,11 @@ func (r Request) Validate() error {
 	return nil
 }
 
-type Response struct {
+type CreateOrderResponse struct {
 	OrderId int64 `json:"orderId"`
 }
 
-func New(domainLogic *domain.Model) *Handler {
-	return &Handler{
-		businessLogic: domainLogic,
-	}
-}
-
-func (h *Handler) Handle(req Request) (Response, error) {
+func (h *LomsHandlersRegistry) HandleCreateOrder(req CreateOrderRequest) (CreateOrderResponse, error) {
 	items := make([]domain.OrderItem, len(req.Items))
 
 	for idx, item := range req.Items {
@@ -50,11 +40,11 @@ func (h *Handler) Handle(req Request) (Response, error) {
 		}
 	}
 
-	orderId, err := h.businessLogic.CreateOrder(req.User, items)
+	orderId, err := h.domainLogic.CreateOrder(req.User, items)
 
 	if err != nil {
-		return Response{}, errors.Wrap(err, "creation failed")
+		return CreateOrderResponse{}, errors.Wrap(err, "creation failed")
 	}
 
-	return Response{OrderId: orderId}, nil
+	return CreateOrderResponse{OrderId: orderId}, nil
 }

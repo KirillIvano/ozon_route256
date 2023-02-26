@@ -6,10 +6,7 @@ import (
 	loms_client "route256/checkout/internal/clients/loms"
 	products_client "route256/checkout/internal/clients/products"
 	"route256/checkout/internal/config"
-	addtocart "route256/checkout/internal/controllers/add_to_cart"
-	deletfromcart "route256/checkout/internal/controllers/delete_from_cart"
-	listcart "route256/checkout/internal/controllers/list_cart"
-	"route256/checkout/internal/controllers/purchase"
+	"route256/checkout/internal/controllers"
 	"route256/checkout/internal/domain"
 	"route256/libs/jsonhandlerwrap"
 )
@@ -22,20 +19,16 @@ func main() {
 		log.Fatal("config init failed")
 	}
 
-	lomsClient := loms_client.New()
-	productClient := products_client.New()
+	lomsClient := loms_client.New(config.ConfigData.Services.Loms)
+	productClient := products_client.New(config.ConfigData.Services.Products, config.ConfigData.Token)
 
 	businessLogic := domain.New(lomsClient, productClient)
+	controllersRegistry := controllers.NewCheckoutHandlersRegistry(businessLogic)
 
-	addToCartHandler := addtocart.New(businessLogic)
-	deleteFromCartHandler := deletfromcart.New(businessLogic)
-	purchaseHandler := purchase.New(businessLogic)
-	listHandler := listcart.New(businessLogic)
-
-	http.Handle("/addToCart", jsonhandlerwrap.New(addToCartHandler.Handle))
-	http.Handle("/deleteFromCart", jsonhandlerwrap.New(deleteFromCartHandler.Handle))
-	http.Handle("/purchase", jsonhandlerwrap.New(purchaseHandler.Handle))
-	http.Handle("/listCart", jsonhandlerwrap.New(listHandler.Handle))
+	http.Handle("/addToCart", jsonhandlerwrap.New(controllersRegistry.HandleAddToCart))
+	http.Handle("/deleteFromCart", jsonhandlerwrap.New(controllersRegistry.HandleDeleteFromCart))
+	http.Handle("/purchase", jsonhandlerwrap.New(controllersRegistry.HandlePurchase))
+	http.Handle("/listCart", jsonhandlerwrap.New(controllersRegistry.HandleListCart))
 
 	log.Println("listening http at", PORT)
 	err = http.ListenAndServe(PORT, nil)

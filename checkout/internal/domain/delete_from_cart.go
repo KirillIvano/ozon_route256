@@ -9,7 +9,7 @@ var (
 	ErrInvalidCount  = errors.New("count is invalid")
 )
 
-func (m *Model) DeleteFromCart(user int64, sku uint32, count uint16) error {
+func (m *CheckoutDomain) DeleteFromCart(user int64, sku uint32, count uint16) error {
 	itemMock := CartItem{
 		UserId: 2,
 		Sku:    2,

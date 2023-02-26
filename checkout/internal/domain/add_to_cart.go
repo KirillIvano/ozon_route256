@@ -6,7 +6,7 @@ var (
 	ErrInsufficientStocks = errors.New("insufficient stocks")
 )
 
-func (m *Model) AddToCart(user int64, sku uint32, count uint16) error {
+func (m *CheckoutDomain) AddToCart(user int64, sku uint32, count uint16) error {
 	stocks, err := m.lomsService.Stocks(sku)
 	if err != nil {
 		return errors.WithMessage(err, "checking stocks")

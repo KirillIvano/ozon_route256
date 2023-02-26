@@ -1,0 +1,4 @@
+token: <YOUR_TOKEN>
+services:
+  loms: http://loms:8081
+  products: http://route256.pavl.uk:8080

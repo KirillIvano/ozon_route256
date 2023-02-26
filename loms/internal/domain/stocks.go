@@ -1,6 +1,6 @@
 package domain
 
-func (m *Model) Stocks(sku uint32) ([]Stock, error) {
+func (m *LomsDomain) Stocks(sku uint32) ([]Stock, error) {
 
 	return []Stock{
 		{

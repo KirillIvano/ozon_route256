@@ -1,4 +1,0 @@
-curl http://127.0.0.1:8081/createOrder -i -d '{
-"user": 1,
-"items": [{"sku": 1,"count": 1}]
-}'

@@ -21,8 +21,3 @@ type Offer struct {
 	Price uint32
 	Name  string
 }
-
-type Model struct {
-	lomsService    LomsService
-	productService ProductService
-}

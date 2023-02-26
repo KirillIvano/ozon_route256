@@ -9,8 +9,13 @@ type ProductService interface {
 	GetProduct(sku uint32) (ProductInfo, error)
 }
 
-func New(lomsService LomsService, productService ProductService) *Model {
-	return &Model{
+type CheckoutDomain struct {
+	lomsService    LomsService
+	productService ProductService
+}
+
+func New(lomsService LomsService, productService ProductService) *CheckoutDomain {
+	return &CheckoutDomain{
 		lomsService:    lomsService,
 		productService: productService,
 	}

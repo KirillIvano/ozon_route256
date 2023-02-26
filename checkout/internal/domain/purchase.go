@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (m *Model) Purchase(userId uint64) error {
+func (m *CheckoutDomain) Purchase(userId uint64) error {
 	// TODO temporary variable, delete when database appears
 	itemsMock := []CartItem{
 		{
