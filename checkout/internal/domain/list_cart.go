@@ -1,8 +1,6 @@
 package domain
 
-import (
-	"github.com/pkg/errors"
-)
+import "github.com/pkg/errors"
 
 type ListCartResponse struct {
 	Offers     []Offer
@@ -25,22 +23,37 @@ func (m *CheckoutDomain) ListCart(user uint32) (ListCartResponse, error) {
 	items := itemsMock
 
 	res := make([]Offer, len(items))
-	totalPrice := uint32(0)
 
-	// TODO: ваще такое параллелить надо, но пока у меня лапки
+	var priceChan = make(chan uint32)
+	var errChan = make(chan error)
+
 	for idx, item := range items {
-		product, err := m.productService.GetProduct(item.Sku)
+		go func(idx int, item CartItem) {
+			product, err := m.productService.GetProduct(item.Sku)
 
-		if err != nil {
-			return ListCartResponse{}, errors.Wrap(err, "requesting product info")
-		}
+			if err != nil {
+				errChan <- err
+				return
+			}
 
-		res[idx] = Offer{
-			CartItem: item,
-			Price:    product.Price,
-			Name:     product.Name,
+			// разные области памяти, безопасно
+			res[idx] = Offer{
+				CartItem: item,
+				Price:    product.Price,
+				Name:     product.Name,
+			}
+			priceChan <- product.Price
+		}(idx, item)
+	}
+
+	totalPrice := uint32(0)
+	for i := 0; i < len(items); i++ {
+		select {
+		case price := <-priceChan:
+			totalPrice += price
+		case err := <-errChan:
+			return ListCartResponse{}, errors.Wrap(err, "fetching products")
 		}
-		totalPrice += product.Price
 	}
 
 	return ListCartResponse{
