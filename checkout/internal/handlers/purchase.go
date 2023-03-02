@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -22,7 +22,7 @@ func (r PurchaseRequest) Validate() error {
 
 type PurchaseResponse struct{}
 
-func (h *CheckoutHandlersRegistry) HandlePurchase(req PurchaseRequest) (PurchaseResponse, error) {
+func (h *CheckoutHandlersRegistry) Purchase(req PurchaseRequest) (PurchaseResponse, error) {
 	err := h.domainLogic.Purchase(req.User)
 
 	if err != nil {

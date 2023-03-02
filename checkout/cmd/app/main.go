@@ -6,8 +6,8 @@ import (
 	loms_client "route256/checkout/internal/clients/loms"
 	products_client "route256/checkout/internal/clients/products"
 	"route256/checkout/internal/config"
-	"route256/checkout/internal/controllers"
 	"route256/checkout/internal/domain"
+	"route256/checkout/internal/handlers"
 	"route256/libs/jsonhandlerwrap"
 )
 
@@ -23,12 +23,13 @@ func main() {
 	productClient := products_client.New(config.ConfigData.Services.Products, config.ConfigData.Token)
 
 	businessLogic := domain.New(lomsClient, productClient)
-	controllersRegistry := controllers.NewCheckoutHandlersRegistry(businessLogic)
 
-	http.Handle("/addToCart", jsonhandlerwrap.New(controllersRegistry.HandleAddToCart))
-	http.Handle("/deleteFromCart", jsonhandlerwrap.New(controllersRegistry.HandleDeleteFromCart))
-	http.Handle("/purchase", jsonhandlerwrap.New(controllersRegistry.HandlePurchase))
-	http.Handle("/listCart", jsonhandlerwrap.New(controllersRegistry.HandleListCart))
+	handlersRegistry := handlers.New(businessLogic)
+
+	http.Handle("/addToCart", jsonhandlerwrap.New(handlersRegistry.AddToCart))
+	http.Handle("/deleteFromCart", jsonhandlerwrap.New(handlersRegistry.DeleteFromCart))
+	http.Handle("/purchase", jsonhandlerwrap.New(handlersRegistry.Purchase))
+	http.Handle("/listCart", jsonhandlerwrap.New(handlersRegistry.ListCart))
 
 	log.Println("listening http at", PORT)
 	err = http.ListenAndServe(PORT, nil)

@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -31,7 +31,7 @@ type ListOrderResponse struct {
 	Items  []ListOrderResponseItem `json:"items"`
 }
 
-func (h *LomsHandlersRegistry) HandleListOrder(req ListOrderRequest) (ListOrderResponse, error) {
+func (h *LomsHandlersRegistry) ListOrder(req ListOrderRequest) (ListOrderResponse, error) {
 	orderInfo, err := h.domainLogic.ListOrder(req.OrderId)
 
 	if err != nil {

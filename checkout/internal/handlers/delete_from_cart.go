@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -34,7 +34,7 @@ func (r DeleteFromCartRequest) Validate() error {
 
 type DeleteFromCartResponse struct{}
 
-func (h *CheckoutHandlersRegistry) HandleDeleteFromCart(req DeleteFromCartRequest) (DeleteFromCartResponse, error) {
+func (h *CheckoutHandlersRegistry) DeleteFromCart(req DeleteFromCartRequest) (DeleteFromCartResponse, error) {
 	err := h.domainLogic.DeleteFromCart(req.User, req.Sku, req.Count)
 
 	if err != nil {

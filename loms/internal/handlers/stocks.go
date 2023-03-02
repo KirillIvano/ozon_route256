@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -29,7 +29,7 @@ type StocksResponse struct {
 	Stocks []ResponseStock `json:"stocks"`
 }
 
-func (h *LomsHandlersRegistry) HandleStocks(req StocksRequest) (StocksResponse, error) {
+func (h *LomsHandlersRegistry) Stocks(req StocksRequest) (StocksResponse, error) {
 	stocks, err := h.domainLogic.Stocks(req.Sku)
 
 	if err != nil {

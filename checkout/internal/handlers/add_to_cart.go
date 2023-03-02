@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -36,7 +36,7 @@ type AddToCartResponse struct {
 	Result string
 }
 
-func (h *CheckoutHandlersRegistry) HandleAddToCart(req AddToCartRequest) (AddToCartResponse, error) {
+func (h *CheckoutHandlersRegistry) AddToCart(req AddToCartRequest) (AddToCartResponse, error) {
 	err := h.domainLogic.AddToCart(req.User, req.Sku, req.Count)
 
 	if err != nil {

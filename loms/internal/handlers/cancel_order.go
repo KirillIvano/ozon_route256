@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -22,7 +22,7 @@ func (r CancelOrderRequest) Validate() error {
 
 type CancelOrderResponse struct{}
 
-func (h *LomsHandlersRegistry) HandleCancelOrder(req CancelOrderRequest) (CancelOrderResponse, error) {
+func (h *LomsHandlersRegistry) CancelOrder(req CancelOrderRequest) (CancelOrderResponse, error) {
 	err := h.domainLogic.CancelOrder(req.OrderId)
 
 	if err != nil {

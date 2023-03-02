@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -21,7 +21,7 @@ func (r OrderPayedRequest) Validate() error {
 	return nil
 }
 
-func (h *LomsHandlersRegistry) HandleOrderPayed(req OrderPayedRequest) (OrderPayedResponse, error) {
+func (h *LomsHandlersRegistry) OrderPayed(req OrderPayedRequest) (OrderPayedResponse, error) {
 	err := h.domainLogic.SetOrderPayed(req.OrderId)
 
 	if err != nil {

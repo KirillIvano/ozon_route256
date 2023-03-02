@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"github.com/pkg/errors"
@@ -32,7 +32,7 @@ type ListCartResponse struct {
 	Total uint64                 `json:"total"`
 }
 
-func (h *CheckoutHandlersRegistry) HandleListCart(req ListCartRequest) (ListCartResponse, error) {
+func (h *CheckoutHandlersRegistry) ListCart(req ListCartRequest) (ListCartResponse, error) {
 	res, err := h.domainLogic.ListCart(uint32(req.User))
 
 	if err != nil {

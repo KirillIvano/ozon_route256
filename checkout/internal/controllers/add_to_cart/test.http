@@ -1,1 +1,0 @@
-curl http://127.0.0.1:8080/addToCart -i -d '{"user": 1, "sku": 1, "count": 3}'

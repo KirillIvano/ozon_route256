@@ -1,4 +1,4 @@
-package controllers
+package handlers
 
 import (
 	"route256/loms/internal/domain"
@@ -30,7 +30,7 @@ type CreateOrderResponse struct {
 	OrderId int64 `json:"orderId"`
 }
 
-func (h *LomsHandlersRegistry) HandleCreateOrder(req CreateOrderRequest) (CreateOrderResponse, error) {
+func (h *LomsHandlersRegistry) CreateOrder(req CreateOrderRequest) (CreateOrderResponse, error) {
 	items := make([]domain.OrderItem, len(req.Items))
 
 	for idx, item := range req.Items {
