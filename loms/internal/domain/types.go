@@ -17,6 +17,7 @@ type OrderInfo struct {
 }
 
 var (
+	OrderStatusUnspecified     = "unspecified"
 	OrderStatusNew             = "new"
 	OrderStatusAwaitingPayment = "awaiting payment"
 	OrderStatusFailed          = "failed"

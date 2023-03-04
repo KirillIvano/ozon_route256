@@ -32,8 +32,17 @@ message ListOrderParams {
     int64 orderID = 1;
 }
 
+enum OrderStatus {
+    ORDER_UNSPECIFIED = 0;
+    ORDER_NEW = 1;
+    ORDER_AWAITING_PAYMENT = 2;
+    ORDER_FAILED = 3;
+    ORDER_PAYED = 4;
+    ORDER_CANCELLED = 5;
+}
+
 message ListOrderResponse {
-    string status = 1;
+    OrderStatus status = 1;
     int64 user = 2;
     repeated OrderItem items = 3;
 }

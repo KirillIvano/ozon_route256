@@ -29,10 +29,6 @@ bindir:
 format: install-smartimports
 	${SMARTIMPORTS} -exclude internal/mocks
 
-install-proto:
-	go get -u google.golang.org/protobuf/cmd/protoc-gen-go
-	go get -u google.golang.org/grpc/cmd/protoc-gen-go-grpc
-
 install-lint: bindir
 	test -f ${LINTBIN} || \
 		(GOBIN=${BINDIR} go install github.com/golangci/golangci-lint/cmd/golangci-lint@${LINTVER} && \
