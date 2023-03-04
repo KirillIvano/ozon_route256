@@ -12,9 +12,20 @@ var (
 	ErrListOrderEmptyOrderId = errors.New("empty order id")
 )
 
+func ValidateListOrderParams(r *lomsV1.ListOrderParams) error {
+	if r.OrderID == 0 {
+		return ErrListOrderEmptyOrderId
+	}
+
+	return nil
+}
+
 func (impl *implementation) ListOrder(ctx context.Context, params *lomsV1.ListOrderParams) (*lomsV1.ListOrderResponse, error) {
-	// validate request
-	orderInfo, err := impl.lomsDomain.ListOrder(params.GetOrderID())
+	if err := ValidateListOrderParams(params); err != nil {
+		return nil, err
+	}
+
+	orderInfo, err := impl.lomsDomain.ListOrder(params.OrderID)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "creation failed")

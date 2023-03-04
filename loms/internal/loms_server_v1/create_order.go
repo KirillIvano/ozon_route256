@@ -12,7 +12,19 @@ var (
 	ErrEmptyUser = errors.New("empty user")
 )
 
+func ValidateCreateOrderParams(r *lomsV1.CreateOrderParams) error {
+	if r.User == 0 {
+		return ErrEmptyUser
+	}
+
+	return nil
+}
+
 func (impl *implementation) CreateOrder(ctx context.Context, params *lomsV1.CreateOrderParams) (*lomsV1.CreateOrderResponse, error) {
+	if err := ValidateCreateOrderParams(params); err != nil {
+		return nil, err
+	}
+
 	items := make([]domain.OrderItem, len(params.Items))
 
 	for idx, item := range params.Items {

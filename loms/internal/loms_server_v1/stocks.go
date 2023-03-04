@@ -11,8 +11,20 @@ var (
 	ErrStocksEmptySku = errors.New("empty sku")
 )
 
-func (impl *implementation) Stocks(ctx context.Context, req *lomsV1.StocksParams) (*lomsV1.StocksResponse, error) {
-	stocks, err := impl.lomsDomain.Stocks(req.Sku)
+func ValidateStocksParams(r *lomsV1.StocksParams) error {
+	if r.Sku == 0 {
+		return ErrStocksEmptySku
+	}
+
+	return nil
+}
+
+func (impl *implementation) Stocks(ctx context.Context, params *lomsV1.StocksParams) (*lomsV1.StocksResponse, error) {
+	if err := ValidateStocksParams(params); err != nil {
+		return nil, err
+	}
+
+	stocks, err := impl.lomsDomain.Stocks(params.Sku)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "creation failed")
