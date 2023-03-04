@@ -7,7 +7,7 @@ type Stock struct {
 
 type OrderItem struct {
 	Sku   uint32
-	Count uint16
+	Count uint32
 }
 
 type OrderInfo struct {

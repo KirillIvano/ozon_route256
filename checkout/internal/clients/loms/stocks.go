@@ -1,32 +1,15 @@
 package loms_client
 
 import (
-	"net/http"
+	"context"
 	"route256/checkout/internal/domain"
-	"route256/libs/jsonreqwrap"
+	lomsV1 "route256/loms/pkg/loms_v1"
 )
 
-type StocksRequestBody struct {
-	Sku uint32 `json:"sku"`
-}
+func (c *Client) Stocks(ctx context.Context, sku uint32) ([]domain.Stock, error) {
+	requestData := lomsV1.StocksParams{Sku: sku}
 
-type StockResponseItem struct {
-	Count       uint64 `json:"count"`
-	WarehouseID uint64 `json:"warehouseID"`
-}
-
-type StocksResponse struct {
-	Stocks []StockResponseItem `json:"stocks"`
-}
-
-func (c *Client) Stocks(sku uint32) ([]domain.Stock, error) {
-	reqClient := jsonreqwrap.NewClient[StocksRequestBody, StocksResponse](
-		c.urlStocks,
-		http.MethodPost,
-	)
-	requestData := StocksRequestBody{Sku: sku}
-
-	response, err := reqClient.Run(requestData)
+	response, err := c.client.Stocks(ctx, &requestData)
 
 	if err != nil {
 		return nil, err

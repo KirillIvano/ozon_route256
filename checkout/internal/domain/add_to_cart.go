@@ -1,13 +1,17 @@
 package domain
 
-import "github.com/pkg/errors"
+import (
+	"context"
+
+	"github.com/pkg/errors"
+)
 
 var (
 	ErrInsufficientStocks = errors.New("insufficient stocks")
 )
 
-func (m *CheckoutDomain) AddToCart(user int64, sku uint32, count uint16) error {
-	stocks, err := m.lomsService.Stocks(sku)
+func (m *CheckoutDomain) AddToCart(ctx context.Context, user int64, sku uint32, count uint32) error {
+	stocks, err := m.lomsService.Stocks(ctx, sku)
 	if err != nil {
 		return errors.WithMessage(err, "checking stocks")
 	}

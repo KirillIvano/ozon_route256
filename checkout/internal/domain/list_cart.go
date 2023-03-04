@@ -1,6 +1,10 @@
 package domain
 
-import "github.com/pkg/errors"
+import (
+	"context"
+
+	"github.com/pkg/errors"
+)
 
 type ListCartResponse struct {
 	Offers     []Offer
@@ -27,9 +31,12 @@ func (m *CheckoutDomain) ListCart(user uint32) (ListCartResponse, error) {
 	var priceChan = make(chan uint32)
 	var errChan = make(chan error)
 
+	// TODO: убрать
+	ctx := context.Background()
+
 	for idx, item := range items {
 		go func(idx int, item CartItem) {
-			product, err := m.productService.GetProduct(item.Sku)
+			product, err := m.productService.GetProduct(ctx, item.Sku)
 
 			if err != nil {
 				errChan <- err
