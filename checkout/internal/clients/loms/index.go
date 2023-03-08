@@ -3,14 +3,14 @@ package loms_client
 import (
 	"context"
 	"log"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Client struct {
-	client lomsV1.LomsV1Client
+	client lomsService.LomsClient
 	conn   *grpc.ClientConn
 }
 
@@ -24,7 +24,7 @@ func New(ctx context.Context, urlOrigin string) *Client {
 		log.Fatalf("failed to connect to server: %v", err)
 	}
 
-	c := lomsV1.NewLomsV1Client(conn)
+	c := lomsService.NewLomsClient(conn)
 
 	return &Client{
 		client: c,

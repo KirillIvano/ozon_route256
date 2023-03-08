@@ -1,8 +1,8 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"context"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -12,7 +12,7 @@ var (
 	ErrOrderPayedEmptyOrderId = errors.New("empty order id")
 )
 
-func ValidateOrderPayedParams(r *lomsV1.OrderPayedParams) error {
+func ValidateOrderPayedParams(r *lomsService.OrderPayedParams) error {
 	if r.OrderID == 0 {
 		return ErrOrderPayedEmptyOrderId
 	}
@@ -20,7 +20,7 @@ func ValidateOrderPayedParams(r *lomsV1.OrderPayedParams) error {
 	return nil
 }
 
-func (impl *implementation) OrderPayed(ctx context.Context, params *lomsV1.OrderPayedParams) (*emptypb.Empty, error) {
+func (impl *implementation) OrderPayed(ctx context.Context, params *lomsService.OrderPayedParams) (*emptypb.Empty, error) {
 	if err := ValidateOrderPayedParams(params); err != nil {
 		return nil, err
 	}

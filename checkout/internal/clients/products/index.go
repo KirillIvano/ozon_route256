@@ -3,7 +3,7 @@ package products_client
 import (
 	"context"
 	"log"
-	"route256/products/pkg/products_v1"
+	productsService "route256/products/pkg/products_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -12,7 +12,7 @@ import (
 type client struct {
 	token string
 
-	client products_v1.ProductServiceClient
+	client productsService.ProductServiceClient
 	conn   *grpc.ClientConn
 }
 
@@ -26,7 +26,7 @@ func New(ctx context.Context, urlOrigin string, token string) *client {
 		log.Fatalf("failed to connect to server: %v", err)
 	}
 
-	c := products_v1.NewProductServiceClient(conn)
+	c := productsService.NewProductServiceClient(conn)
 
 	return &client{
 		token:  token,

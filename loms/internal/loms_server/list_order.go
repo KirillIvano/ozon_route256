@@ -1,8 +1,8 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"context"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
 )
@@ -11,7 +11,7 @@ var (
 	ErrListOrderEmptyOrderId = errors.New("empty order id")
 )
 
-func ValidateListOrderParams(r *lomsV1.ListOrderParams) error {
+func ValidateListOrderParams(r *lomsService.ListOrderParams) error {
 	if r.OrderID == 0 {
 		return ErrListOrderEmptyOrderId
 	}
@@ -19,7 +19,7 @@ func ValidateListOrderParams(r *lomsV1.ListOrderParams) error {
 	return nil
 }
 
-func (impl *implementation) ListOrder(ctx context.Context, params *lomsV1.ListOrderParams) (*lomsV1.ListOrderResponse, error) {
+func (impl *implementation) ListOrder(ctx context.Context, params *lomsService.ListOrderParams) (*lomsService.ListOrderResponse, error) {
 	if err := ValidateListOrderParams(params); err != nil {
 		return nil, err
 	}
@@ -30,16 +30,16 @@ func (impl *implementation) ListOrder(ctx context.Context, params *lomsV1.ListOr
 		return nil, errors.Wrap(err, "creation failed")
 	}
 
-	responseItems := make([]*lomsV1.OrderItem, len(orderInfo.Items))
+	responseItems := make([]*lomsService.OrderItem, len(orderInfo.Items))
 	for idx, item := range orderInfo.Items {
-		responseItems[idx] = &lomsV1.OrderItem{
+		responseItems[idx] = &lomsService.OrderItem{
 			Sku:   item.Sku,
 			Count: item.Count,
 		}
 	}
 
-	return &lomsV1.ListOrderResponse{
-		Status: lomsV1.OrderStatus(lomsV1.OrderStatus_value[orderInfo.Status]),
+	return &lomsService.ListOrderResponse{
+		Status: lomsService.OrderStatus(lomsService.OrderStatus_value[orderInfo.Status]),
 		User:   orderInfo.User,
 		Items:  responseItems,
 	}, nil

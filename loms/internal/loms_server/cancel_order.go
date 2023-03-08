@@ -1,8 +1,8 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"context"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -12,7 +12,7 @@ var (
 	ErrCancelOrderEmptyOrderId = errors.New("empty order id")
 )
 
-func ValidateCancelOrderParams(r *lomsV1.OrderCancelParams) error {
+func ValidateCancelOrderParams(r *lomsService.OrderCancelParams) error {
 	if r.OrderID == 0 {
 		return ErrCancelOrderEmptyOrderId
 	}
@@ -20,7 +20,7 @@ func ValidateCancelOrderParams(r *lomsV1.OrderCancelParams) error {
 	return nil
 }
 
-func (impl *implementation) CancelOrder(ctx context.Context, params *lomsV1.OrderCancelParams) (*emptypb.Empty, error) {
+func (impl *implementation) CancelOrder(ctx context.Context, params *lomsService.OrderCancelParams) (*emptypb.Empty, error) {
 	if err := ValidateCancelOrderParams(params); err != nil {
 		return nil, err
 	}

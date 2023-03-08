@@ -1,8 +1,8 @@
-package checkout_server_v1
+package checkout_server
 
 import (
 	"context"
-	checkoutV1 "route256/checkout/pkg/checkout_v1"
+	checkoutService "route256/checkout/pkg/checkout_service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -14,7 +14,7 @@ var (
 	ErrDeleteFromCartBadRequest = errors.New("bad request")
 )
 
-func ValidateDeleteFromCartRequest(r *checkoutV1.DeleteFromCartParams) error {
+func ValidateDeleteFromCartRequest(r *checkoutService.DeleteFromCartParams) error {
 	if r.User == 0 {
 		return ErrDeleteFromCartEmptyUser
 	}
@@ -30,7 +30,7 @@ func ValidateDeleteFromCartRequest(r *checkoutV1.DeleteFromCartParams) error {
 	return nil
 }
 
-func (impl *implementation) DeleteFromCart(ctx context.Context, req *checkoutV1.DeleteFromCartParams) (*emptypb.Empty, error) {
+func (impl *implementation) DeleteFromCart(ctx context.Context, req *checkoutService.DeleteFromCartParams) (*emptypb.Empty, error) {
 	if err := ValidateDeleteFromCartRequest(req); err != nil {
 		return nil, err
 	}

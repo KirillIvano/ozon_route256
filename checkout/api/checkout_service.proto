@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package checkout_v1;
+package checkout;
 
-option go_package = "route256/checkout/pkg/checkout_v1;checkout_v1";
+option go_package = "route256/checkout/pkg/checkout_service;checkout_service";
 
 import "google/protobuf/empty.proto";
 
-service CheckoutV1 {
+service Checkout {
     rpc AddToCart (AddToCartParams) returns (google.protobuf.Empty) {};
     rpc DeleteFromCart (DeleteFromCartParams) returns (google.protobuf.Empty) {};
     rpc ListCart (ListCartParams) returns (ListCartResponse) {};

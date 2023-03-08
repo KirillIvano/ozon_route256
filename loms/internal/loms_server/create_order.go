@@ -1,9 +1,9 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"context"
 	"route256/loms/internal/domain"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
 )
@@ -12,7 +12,7 @@ var (
 	ErrEmptyUser = errors.New("empty user")
 )
 
-func ValidateCreateOrderParams(r *lomsV1.CreateOrderParams) error {
+func ValidateCreateOrderParams(r *lomsService.CreateOrderParams) error {
 	if r.User == 0 {
 		return ErrEmptyUser
 	}
@@ -20,7 +20,7 @@ func ValidateCreateOrderParams(r *lomsV1.CreateOrderParams) error {
 	return nil
 }
 
-func (impl *implementation) CreateOrder(ctx context.Context, params *lomsV1.CreateOrderParams) (*lomsV1.CreateOrderResponse, error) {
+func (impl *implementation) CreateOrder(ctx context.Context, params *lomsService.CreateOrderParams) (*lomsService.CreateOrderResponse, error) {
 	if err := ValidateCreateOrderParams(params); err != nil {
 		return nil, err
 	}
@@ -40,5 +40,5 @@ func (impl *implementation) CreateOrder(ctx context.Context, params *lomsV1.Crea
 		return nil, errors.Wrap(err, "creation failed")
 	}
 
-	return &lomsV1.CreateOrderResponse{OrderId: orderId}, nil
+	return &lomsService.CreateOrderResponse{OrderId: orderId}, nil
 }

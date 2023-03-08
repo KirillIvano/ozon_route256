@@ -1,8 +1,8 @@
-package checkout_server_v1
+package checkout_server
 
 import (
 	"context"
-	checkoutV1 "route256/checkout/pkg/checkout_v1"
+	checkoutService "route256/checkout/pkg/checkout_service"
 
 	"github.com/pkg/errors"
 )
@@ -11,7 +11,7 @@ var (
 	ErrListCartEmptyUser = errors.New("empty user")
 )
 
-func ValidateListCart(r *checkoutV1.ListCartParams) error {
+func ValidateListCart(r *checkoutService.ListCartParams) error {
 	if r.User == 0 {
 		return ErrListCartEmptyUser
 	}
@@ -19,7 +19,7 @@ func ValidateListCart(r *checkoutV1.ListCartParams) error {
 	return nil
 }
 
-func (impl *implementation) ListCart(ctx context.Context, req *checkoutV1.ListCartParams) (*checkoutV1.ListCartResponse, error) {
+func (impl *implementation) ListCart(ctx context.Context, req *checkoutService.ListCartParams) (*checkoutService.ListCartResponse, error) {
 	if err := ValidateListCart(req); err != nil {
 		return nil, err
 	}
@@ -30,9 +30,9 @@ func (impl *implementation) ListCart(ctx context.Context, req *checkoutV1.ListCa
 		return nil, errors.Wrap(err, "getting failed")
 	}
 
-	items := make([]*checkoutV1.ListCartItem, len(res.Offers))
+	items := make([]*checkoutService.ListCartItem, len(res.Offers))
 	for i, offer := range res.Offers {
-		items[i] = &checkoutV1.ListCartItem{
+		items[i] = &checkoutService.ListCartItem{
 			Sku:   offer.Sku,
 			Count: offer.Count,
 			Name:  offer.Name,
@@ -40,7 +40,7 @@ func (impl *implementation) ListCart(ctx context.Context, req *checkoutV1.ListCa
 		}
 	}
 
-	return &checkoutV1.ListCartResponse{
+	return &checkoutService.ListCartResponse{
 		Items:      items,
 		TotalPrice: res.TotalPrice,
 	}, nil

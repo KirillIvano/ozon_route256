@@ -1,8 +1,8 @@
-package checkout_server_v1
+package checkout_server
 
 import (
 	"context"
-	checkoutV1 "route256/checkout/pkg/checkout_v1"
+	checkoutService "route256/checkout/pkg/checkout_service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -14,7 +14,7 @@ var (
 	ErrAddToCartBadRequest = errors.New("bad request")
 )
 
-func ValidateAddToCart(r *checkoutV1.AddToCartParams) error {
+func ValidateAddToCart(r *checkoutService.AddToCartParams) error {
 	if r.User == 0 {
 		return ErrAddToCartEmptyUser
 	}
@@ -30,7 +30,7 @@ func ValidateAddToCart(r *checkoutV1.AddToCartParams) error {
 	return nil
 }
 
-func (impl *implementation) AddToCart(ctx context.Context, req *checkoutV1.AddToCartParams) (*emptypb.Empty, error) {
+func (impl *implementation) AddToCart(ctx context.Context, req *checkoutService.AddToCartParams) (*emptypb.Empty, error) {
 	if err := ValidateAddToCart(req); err != nil {
 		return nil, err
 	}

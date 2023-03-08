@@ -3,7 +3,7 @@ package products_client
 import (
 	"context"
 	"route256/checkout/internal/domain"
-	productsClient "route256/products/pkg/products_v1"
+	productsService "route256/products/pkg/products_service"
 )
 
 type GetProductRequest struct {
@@ -17,7 +17,7 @@ type GetProductResponse struct {
 }
 
 func (c *client) GetProduct(ctx context.Context, sku uint32) (domain.ProductInfo, error) {
-	res, err := c.client.GetProduct(ctx, &productsClient.GetProductRequest{Sku: sku, Token: c.token})
+	res, err := c.client.GetProduct(ctx, &productsService.GetProductRequest{Sku: sku, Token: c.token})
 
 	if err != nil {
 		return domain.ProductInfo{}, err

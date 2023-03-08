@@ -1,8 +1,8 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"context"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
 )
@@ -11,7 +11,7 @@ var (
 	ErrStocksEmptySku = errors.New("empty sku")
 )
 
-func ValidateStocksParams(r *lomsV1.StocksParams) error {
+func ValidateStocksParams(r *lomsService.StocksParams) error {
 	if r.Sku == 0 {
 		return ErrStocksEmptySku
 	}
@@ -19,7 +19,7 @@ func ValidateStocksParams(r *lomsV1.StocksParams) error {
 	return nil
 }
 
-func (impl *implementation) Stocks(ctx context.Context, params *lomsV1.StocksParams) (*lomsV1.StocksResponse, error) {
+func (impl *implementation) Stocks(ctx context.Context, params *lomsService.StocksParams) (*lomsService.StocksResponse, error) {
 	if err := ValidateStocksParams(params); err != nil {
 		return nil, err
 	}
@@ -30,15 +30,15 @@ func (impl *implementation) Stocks(ctx context.Context, params *lomsV1.StocksPar
 		return nil, errors.Wrap(err, "creation failed")
 	}
 
-	responseStocks := make([]*lomsV1.StocksResponseItem, len(stocks))
+	responseStocks := make([]*lomsService.StocksResponseItem, len(stocks))
 	for idx, item := range stocks {
-		responseStocks[idx] = &lomsV1.StocksResponseItem{
+		responseStocks[idx] = &lomsService.StocksResponseItem{
 			WarehouseID: item.WarehouseID,
 			Count:       item.Count,
 		}
 	}
 
-	return &lomsV1.StocksResponse{
+	return &lomsService.StocksResponse{
 		Stocks: responseStocks,
 	}, nil
 }

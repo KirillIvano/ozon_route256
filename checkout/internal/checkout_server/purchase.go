@@ -1,8 +1,8 @@
-package checkout_server_v1
+package checkout_server
 
 import (
 	"context"
-	checkoutV1 "route256/checkout/pkg/checkout_v1"
+	checkoutService "route256/checkout/pkg/checkout_service"
 
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -12,7 +12,7 @@ var (
 	ErrPurchaseEmptyUser = errors.New("empty user")
 )
 
-func ValidatePurchaseRequest(r *checkoutV1.PurchaseParams) error {
+func ValidatePurchaseRequest(r *checkoutService.PurchaseParams) error {
 	if r.User == 0 {
 		return ErrPurchaseEmptyUser
 	}
@@ -20,7 +20,7 @@ func ValidatePurchaseRequest(r *checkoutV1.PurchaseParams) error {
 	return nil
 }
 
-func (impl *implementation) Purchase(ctx context.Context, req *checkoutV1.PurchaseParams) (*emptypb.Empty, error) {
+func (impl *implementation) Purchase(ctx context.Context, req *checkoutService.PurchaseParams) (*emptypb.Empty, error) {
 	if err := ValidatePurchaseRequest(req); err != nil {
 		return nil, err
 	}

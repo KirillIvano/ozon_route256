@@ -3,11 +3,11 @@ package loms_client
 import (
 	"context"
 	"route256/checkout/internal/domain"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 )
 
 func (c *Client) Stocks(ctx context.Context, sku uint32) ([]domain.Stock, error) {
-	requestData := lomsV1.StocksParams{Sku: sku}
+	requestData := lomsService.StocksParams{Sku: sku}
 
 	response, err := c.client.Stocks(ctx, &requestData)
 

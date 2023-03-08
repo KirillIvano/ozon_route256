@@ -1,17 +1,17 @@
-package checkout_server_v1
+package checkout_server
 
 import (
 	"route256/checkout/internal/domain"
-	checkoutV1 "route256/checkout/pkg/checkout_v1"
+	checkoutService "route256/checkout/pkg/checkout_service"
 )
 
 type implementation struct {
-	checkoutV1.UnimplementedCheckoutV1Server
+	checkoutService.UnimplementedCheckoutServer
 
 	checkoutDomain *domain.CheckoutDomain
 }
 
-var _ checkoutV1.CheckoutV1Server = &implementation{}
+var _ checkoutService.CheckoutServer = &implementation{}
 
 func New(domain *domain.CheckoutDomain) *implementation {
 	return &implementation{

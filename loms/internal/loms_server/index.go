@@ -1,17 +1,17 @@
-package loms_server_v1
+package loms_server
 
 import (
 	"route256/loms/internal/domain"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsService "route256/loms/pkg/loms_service"
 )
 
 type implementation struct {
-	lomsV1.UnimplementedLomsV1Server
+	lomsService.UnimplementedLomsServer
 
 	lomsDomain *domain.LomsDomain
 }
 
-var _ lomsV1.LomsV1Server = &implementation{}
+var _ lomsService.LomsServer = &implementation{}
 
 func New(domain *domain.LomsDomain) *implementation {
 	return &implementation{

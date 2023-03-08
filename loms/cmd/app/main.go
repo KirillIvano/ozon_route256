@@ -5,8 +5,8 @@ import (
 	"log"
 	"net"
 	"route256/loms/internal/domain"
-	lomsServer "route256/loms/internal/loms_server_v1"
-	lomsV1 "route256/loms/pkg/loms_v1"
+	lomsServer "route256/loms/internal/loms_server"
+	lomsService "route256/loms/pkg/loms_service"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -23,7 +23,7 @@ func main() {
 	domain := domain.New()
 
 	grpcServer := grpc.NewServer()
-	lomsV1.RegisterLomsV1Server(grpcServer, lomsServer.New(domain))
+	lomsService.RegisterLomsServer(grpcServer, lomsServer.New(domain))
 	reflection.Register(grpcServer)
 
 	if err := grpcServer.Serve(listener); err != nil {
