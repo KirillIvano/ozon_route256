@@ -15,12 +15,3 @@ type OrderInfo struct {
 	User   int64
 	Items  []OrderItem
 }
-
-var (
-	OrderStatusUnspecified     = "unspecified"
-	OrderStatusNew             = "new"
-	OrderStatusAwaitingPayment = "awaiting payment"
-	OrderStatusFailed          = "failed"
-	OrderStatusPayed           = "payed"
-	OrderStatusCancelled       = "cancelled"
-)

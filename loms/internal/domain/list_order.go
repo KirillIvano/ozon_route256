@@ -10,6 +10,6 @@ func (m *LomsDomain) ListOrder(orderId int64) (OrderInfo, error) {
 			},
 		},
 		User:   1,
-		Status: OrderStatusAwaitingPayment,
+		Status: "AWAITING_PAYMENT",
 	}, nil
 }

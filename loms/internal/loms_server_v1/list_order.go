@@ -2,7 +2,6 @@ package loms_server_v1
 
 import (
 	"context"
-	"route256/loms/internal/transformers"
 	lomsV1 "route256/loms/pkg/loms_v1"
 
 	"github.com/pkg/errors"
@@ -40,7 +39,7 @@ func (impl *implementation) ListOrder(ctx context.Context, params *lomsV1.ListOr
 	}
 
 	return &lomsV1.ListOrderResponse{
-		Status: lomsV1.OrderStatus(transformers.TransformDomainOrderStatusToApi(orderInfo.Status)),
+		Status: lomsV1.OrderStatus(lomsV1.OrderStatus_value[orderInfo.Status]),
 		User:   orderInfo.User,
 		Items:  responseItems,
 	}, nil

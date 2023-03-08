@@ -25,30 +25,30 @@ get-vendor-proto:
 generate-proto:
 	mkdir -p loms/pkg/loms_v1
 
-	protoc -I api/loms/v1 -I vendor-proto \
+	protoc -I loms/api -I vendor-proto \
 		--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=loms/pkg/loms_v1 --go_opt=paths=source_relative \
 		--go-grpc_out=loms/pkg/loms_v1 --go-grpc_opt=paths=source_relative \
-		api/loms/v1/loms_service.proto
+		loms/api/loms_service.proto
 
 	mkdir -p products/pkg/products_v1
 
-	protoc -I api/products/v1 -I vendor-proto \
+	protoc -I products/api -I vendor-proto \
 		--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=products/pkg/products_v1 --go_opt=paths=source_relative \
 		--go-grpc_out=products/pkg/products_v1 --go-grpc_opt=paths=source_relative \
-		api/products/v1/product_service.proto
+		products/api/product_service.proto
 
 	mkdir -p checkout/pkg/checkout_v1
 
-	protoc -I api/checkout/v1 -I vendor-proto \
+	protoc -I checkout/api -I vendor-proto \
 		--plugin=protoc-gen-go=$(LOCAL_BIN)/protoc-gen-go \
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=checkout/pkg/checkout_v1 --go_opt=paths=source_relative \
 		--go-grpc_out=checkout/pkg/checkout_v1 --go-grpc_opt=paths=source_relative \
-		api/checkout/v1/checkout_service.proto
+		checkout/api/checkout_service.proto
 
 prepare-proto: install-proto-deps get-vendor-proto generate-proto
 
