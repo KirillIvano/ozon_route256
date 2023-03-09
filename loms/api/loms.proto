@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package loms;
+
+option go_package = "route256/loms/pkg/loms_service;loms";
+
+import "google/protobuf/empty.proto";
+
+service Loms {
+    rpc CreateOrder (CreateOrderParams) returns (CreateOrderResponse) {};
+    rpc ListOrder (ListOrderParams) returns (ListOrderResponse) {};
+    rpc OrderPayed (OrderPayedParams) returns (google.protobuf.Empty) {};
+    rpc CancelOrder (OrderCancelParams) returns (google.protobuf.Empty) {};
+    rpc Stocks (StocksParams) returns (StocksResponse) {};
+}
+
+message OrderItem {
+    uint32 sku = 1;
+    uint32 count = 2;
+}
+
+message CreateOrderParams {
+    int64 user = 1;
+    repeated OrderItem items = 2;
+}
+
+message CreateOrderResponse {
+    int64 orderId = 1;
+}
+
+message ListOrderParams {
+    int64 orderID = 1;
+}
+
+enum OrderStatus {
+    ORDER_UNSPECIFIED = 0;
+    ORDER_NEW = 1;
+    ORDER_AWAITING_PAYMENT = 2;
+    ORDER_FAILED = 3;
+    ORDER_PAYED = 4;
+    ORDER_CANCELLED = 5;
+}
+
+message ListOrderResponse {
+    OrderStatus status = 1;
+    int64 user = 2;
+    repeated OrderItem items = 3;
+}
+
+message OrderPayedParams {
+    int64 orderID = 1;
+}
+
+message OrderCancelParams {
+    int64 orderID = 1;
+}
+
+message StocksParams {
+    uint32 sku = 1;
+}
+
+message StocksResponseItem {
+    int64 warehouseID = 1;
+    uint64 count = 2;
+}
+
+message StocksResponse {
+    repeated StocksResponseItem stocks = 1;
+}

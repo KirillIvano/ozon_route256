@@ -1,12 +1,14 @@
 package domain
 
+import "context"
+
 type LomsService interface {
-	Stocks(sku uint32) ([]Stock, error)
-	CreateOrder(user uint64, items []CartItem) (orderId uint64, err error)
+	Stocks(ctx context.Context, sku uint32) ([]Stock, error)
+	CreateOrder(ctx context.Context, user int64, items []CartItem) (orderId int64, err error)
 }
 
 type ProductService interface {
-	GetProduct(sku uint32) (ProductInfo, error)
+	GetProduct(ctx context.Context, sku uint32) (ProductInfo, error)
 }
 
 type CheckoutDomain struct {

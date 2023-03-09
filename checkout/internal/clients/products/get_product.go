@@ -1,9 +1,9 @@
 package products_client
 
 import (
-	"net/http"
+	"context"
 	"route256/checkout/internal/domain"
-	"route256/libs/jsonreqwrap"
+	productsService "route256/products/pkg/products_service"
 )
 
 type GetProductRequest struct {
@@ -16,24 +16,15 @@ type GetProductResponse struct {
 	Price uint32 `json:"price"`
 }
 
-func (c *Client) GetProduct(sku uint32) (domain.ProductInfo, error) {
-	reqClient := jsonreqwrap.NewClient[GetProductRequest, GetProductResponse](
-		c.urlGetProduct,
-		http.MethodPost,
-	)
-	requestData := GetProductRequest{
-		Sku:   sku,
-		Token: c.token,
-	}
-
-	response, err := reqClient.Run(requestData)
+func (c *client) GetProduct(ctx context.Context, sku uint32) (domain.ProductInfo, error) {
+	res, err := c.client.GetProduct(ctx, &productsService.GetProductRequest{Sku: sku, Token: c.token})
 
 	if err != nil {
 		return domain.ProductInfo{}, err
 	}
 
 	return domain.ProductInfo{
-		Price: response.Price,
-		Name:  response.Name,
+		Price: res.GetPrice(),
+		Name:  res.GetName(),
 	}, nil
 }

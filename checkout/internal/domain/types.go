@@ -8,7 +8,7 @@ type Stock struct {
 type CartItem struct {
 	UserId uint32
 	Sku    uint32
-	Count  uint16
+	Count  uint32
 }
 
 type ProductInfo struct {

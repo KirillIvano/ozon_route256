@@ -7,7 +7,7 @@ type Stock struct {
 
 type OrderItem struct {
 	Sku   uint32
-	Count uint16
+	Count uint32
 }
 
 type OrderInfo struct {
@@ -15,11 +15,3 @@ type OrderInfo struct {
 	User   int64
 	Items  []OrderItem
 }
-
-var (
-	OrderStatusNew             = "new"
-	OrderStatusAwaitingPayment = "awaiting payment"
-	OrderStatusFailed          = "failed"
-	OrderStatusPayed           = "payed"
-	OrderStatusCancelled       = "cancelled"
-)

@@ -1,45 +1,26 @@
 package loms_client
 
 import (
-	"net/http"
+	"context"
 	"route256/checkout/internal/domain"
-	"route256/libs/jsonreqwrap"
+	lomsService "route256/loms/pkg/loms_service"
 )
 
-type CreateOrderItem struct {
-	Sku   uint32 `json:"sku"`
-	Count uint16 `json:"count"`
-}
-
-type CreateOrderRequestBody struct {
-	User  uint64            `json:"user"`
-	Items []CreateOrderItem `json:"items"`
-}
-
-type CreateOrderResponse struct {
-	OrderId uint64 `json:"orderId"`
-}
-
-func (c *Client) CreateOrder(user uint64, items []domain.CartItem) (uint64, error) {
-	reqClient := jsonreqwrap.NewClient[CreateOrderRequestBody, CreateOrderResponse](
-		c.urlCreateOrder,
-		http.MethodPost,
-	)
-
-	createOrderItems := make([]CreateOrderItem, len(items))
+func (c *Client) CreateOrder(ctx context.Context, user int64, items []domain.CartItem) (int64, error) {
+	createOrderItems := make([]*lomsService.OrderItem, len(items))
 	for idx, item := range items {
-		createOrderItems[idx] = CreateOrderItem{
+		createOrderItems[idx] = &lomsService.OrderItem{
 			Sku:   item.Sku,
-			Count: item.Count,
+			Count: uint32(item.Count),
 		}
 	}
 
-	requestData := CreateOrderRequestBody{
+	requestData := lomsService.CreateOrderParams{
 		User:  user,
 		Items: createOrderItems,
 	}
 
-	response, err := reqClient.Run(requestData)
+	response, err := c.client.CreateOrder(ctx, &requestData)
 
 	if err != nil {
 		return 0, err
