@@ -30,7 +30,7 @@ generate-proto:
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=loms/pkg/loms_service --go_opt=paths=source_relative \
 		--go-grpc_out=loms/pkg/loms_service --go-grpc_opt=paths=source_relative \
-		loms/api/loms_service.proto
+		loms/api/loms.proto
 
 	mkdir -p products/pkg/products_service
 
@@ -39,7 +39,7 @@ generate-proto:
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=products/pkg/products_service --go_opt=paths=source_relative \
 		--go-grpc_out=products/pkg/products_service --go-grpc_opt=paths=source_relative \
-		products/api/product_service.proto
+		products/api/product.proto
 
 	mkdir -p checkout/pkg/checkout_service
 
@@ -48,7 +48,7 @@ generate-proto:
 		--plugin=protoc-gen-go-grpc=$(LOCAL_BIN)/protoc-gen-go-grpc \
 		--go_out=checkout/pkg/checkout_service --go_opt=paths=source_relative \
 		--go-grpc_out=checkout/pkg/checkout_service --go-grpc_opt=paths=source_relative \
-		checkout/api/checkout_service.proto
+		checkout/api/checkout.proto
 
 prepare-proto: install-proto-deps get-vendor-proto generate-proto
 

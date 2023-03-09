@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package loms;
 
-option go_package = "route256/loms/pkg/loms_service;loms_service";
+option go_package = "route256/loms/pkg/loms_service;loms";
 
 import "google/protobuf/empty.proto";
 

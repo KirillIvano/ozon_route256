@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package="route256/product-service/pkg/products_service;products_service";
+option go_package="route256/product-service/pkg/products_service;products";
 package route256.product;
 
 service ProductService {

@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package checkout;
 
-option go_package = "route256/checkout/pkg/checkout_service;checkout_service";
+option go_package = "route256/checkout/pkg/checkout_service;checkout";
 
 import "google/protobuf/empty.proto";
 
