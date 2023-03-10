@@ -1,12 +1,10 @@
-module route256/checkout
+module route256/products
 
 go 1.19
 
 require (
-	github.com/pkg/errors v0.9.1
 	google.golang.org/grpc v1.53.0
 	google.golang.org/protobuf v1.28.1
-	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
