@@ -25,7 +25,7 @@ func (impl *implementation) OrderPayed(ctx context.Context, params *lomsService.
 		return nil, err
 	}
 
-	err := impl.lomsDomain.SetOrderPayed(params.OrderID)
+	err := impl.lomsDomain.SetOrderPayed(ctx, params.OrderID)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "cancellation failed")

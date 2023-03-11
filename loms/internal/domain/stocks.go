@@ -1,15 +1,17 @@
 package domain
 
-func (m *LomsDomain) Stocks(sku uint32) ([]Stock, error) {
+import (
+	"context"
 
-	return []Stock{
-		{
-			WarehouseID: 1,
-			Count:       1,
-		},
-		{
-			WarehouseID: 1,
-			Count:       2,
-		},
-	}, nil
+	"github.com/pkg/errors"
+)
+
+func (m *LomsDomain) Stocks(ctx context.Context, sku uint32) ([]Stock, error) {
+	res, err := m.lomsRepository.ListStocks(ctx, sku)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "accessing stocks database")
+	}
+
+	return res, nil
 }

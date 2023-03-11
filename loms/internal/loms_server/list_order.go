@@ -24,10 +24,10 @@ func (impl *implementation) ListOrder(ctx context.Context, params *lomsService.L
 		return nil, err
 	}
 
-	orderInfo, err := impl.lomsDomain.ListOrder(params.OrderID)
+	orderInfo, err := impl.lomsDomain.ListOrder(ctx, params.OrderID)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "creation failed")
+		return nil, errors.Wrap(err, "list order failed")
 	}
 
 	responseItems := make([]*lomsService.OrderItem, len(orderInfo.Items))

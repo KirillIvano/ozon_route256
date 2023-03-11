@@ -34,7 +34,7 @@ func (impl *implementation) CreateOrder(ctx context.Context, params *lomsService
 		}
 	}
 
-	orderId, err := impl.lomsDomain.CreateOrder(params.User, items)
+	orderId, err := impl.lomsDomain.CreateOrder(ctx, params.User, items)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "creation failed")

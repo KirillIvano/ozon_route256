@@ -24,10 +24,10 @@ func (impl *implementation) Stocks(ctx context.Context, params *lomsService.Stoc
 		return nil, err
 	}
 
-	stocks, err := impl.lomsDomain.Stocks(params.Sku)
+	stocks, err := impl.lomsDomain.Stocks(ctx, params.Sku)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "creation failed")
+		return nil, errors.Wrap(err, "stocks getting failed")
 	}
 
 	responseStocks := make([]*lomsService.StocksResponseItem, len(stocks))

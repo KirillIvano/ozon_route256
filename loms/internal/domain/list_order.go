@@ -1,15 +1,16 @@
 package domain
 
-func (m *LomsDomain) ListOrder(orderId int64) (OrderInfo, error) {
+import (
+	"context"
+)
 
-	return OrderInfo{
-		Items: []OrderItem{
-			{
-				Sku:   1,
-				Count: 10,
-			},
-		},
-		User:   1,
-		Status: "AWAITING_PAYMENT",
-	}, nil
+func (m *LomsDomain) ListOrder(ctx context.Context, orderId int64) (*OrderInfo, error) {
+	order, err := m.lomsRepository.GetOrderInfo(ctx, orderId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// return content of single order
+	return order, nil
 }
