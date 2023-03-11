@@ -5,7 +5,6 @@ import (
 	"log"
 	"math"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 
@@ -79,7 +78,7 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 	}
 
 	// Сохраняем элементы заказа и резервируем под них места на складах
-	err = m.lomsRepository.RunTransaction(ctx, pgx.ReadCommitted, func(ctxTX context.Context) error {
+	err = m.lomsRepository.RunReadCommitedTransaction(ctx, func(ctxTX context.Context) error {
 		err := m.lomsRepository.CreateOrderItems(ctx, orderId, items)
 		if err != nil {
 			return errors.Wrap(err, "creating order items")

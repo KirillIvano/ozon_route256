@@ -2,8 +2,6 @@ package domain
 
 import (
 	"context"
-
-	"github.com/jackc/pgx/v5"
 )
 
 type Validator interface {
@@ -19,7 +17,7 @@ type LomsRepository interface {
 	ApplyOrderReservations(ctx context.Context, orderId int64) error
 	CreateReservation(ctx context.Context, reservations []Reservation) error
 	UpdateOrderStatus(ctx context.Context, orderId int64, status string) error
-	RunTransaction(ctx context.Context, level pgx.TxIsoLevel, fx func(ctxTX context.Context) error) error
+	RunReadCommitedTransaction(ctx context.Context, fx func(ctxTX context.Context) error) error
 	GetOrderStatus(ctx context.Context, orderId int64) (string, error)
 }
 

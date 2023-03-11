@@ -8,7 +8,7 @@ import (
 )
 
 func (r repository) GetOrderStatus(ctx context.Context, orderId int64) (string, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 	query, args, err := sq.
 		Select("order_status").
 		From("loms_order").

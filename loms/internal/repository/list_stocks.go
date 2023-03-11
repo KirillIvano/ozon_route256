@@ -12,7 +12,7 @@ import (
 )
 
 func (r repository) ListStocks(ctx context.Context, sku uint32) ([]domain.Stock, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 
 	query, args, err := sq.Select("warehouse_items.warehouse_id", "warehouse_items.count - SUM(COALESCE(reservation.count, 0)) AS count").
 		From("warehouse_items").

@@ -11,7 +11,7 @@ import (
 
 // add transaction for inserting in second table with items
 func (r repository) CreateOrder(ctx context.Context, userId int64) (int64, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 
 	query, args, err := sq.Insert("loms_order").
 		Columns("user_id", "order_status", "created_at").

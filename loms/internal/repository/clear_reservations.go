@@ -8,7 +8,7 @@ import (
 )
 
 func (r repository) ClearReservations(ctx context.Context, orderId int64) error {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 
 	query, args, err := sq.Delete("reservation").
 		Where("order_id = ?", orderId).

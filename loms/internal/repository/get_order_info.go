@@ -11,7 +11,7 @@ import (
 )
 
 func (r repository) GetOrderInfo(ctx context.Context, orderId int64) (*domain.OrderInfo, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 	query, args, err := sq.
 		Select("user_id", "order_id", "order_status", "created_at").
 		From("loms_order").

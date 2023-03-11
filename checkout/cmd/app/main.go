@@ -10,26 +10,35 @@ import (
 	productsClient "route256/checkout/internal/clients/products"
 	"route256/checkout/internal/config"
 	"route256/checkout/internal/domain"
+	"route256/checkout/internal/repository"
 	checkoutService "route256/checkout/pkg/checkout_service"
 
+	"github.com/jackc/pgx/v5"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 const PORT = "8080"
+const CONNECTION_STRING = "postgres://user:password@localhost:8090/checkout?sslmode=disable"
 
 func main() {
+	ctx := context.Background()
+
 	err := config.Init()
 	if err != nil {
 		log.Fatal("config init failed")
 	}
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", PORT))
+	conn, err := pgx.Connect(ctx, CONNECTION_STRING)
 	if err != nil {
-		log.Fatal("failed to listen: ", err)
+		log.Fatal(err)
 	}
+	defer conn.Close(ctx)
 
-	ctx := context.Background()
+	log.Println("database connected successfully")
+
+	repository := repository.New(conn)
+
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -39,7 +48,12 @@ func main() {
 	productClient := productsClient.New(ctx, config.ConfigData.Services.Products, config.ConfigData.Token)
 	defer productClient.Close()
 
-	businessLogic := domain.New(lomsClient, productClient)
+	businessLogic := domain.New(lomsClient, productClient, repository)
+
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", PORT))
+	if err != nil {
+		log.Fatal("failed to listen: ", err)
+	}
 
 	grpcServer := grpc.NewServer()
 	checkoutService.RegisterCheckoutServer(grpcServer, checkoutServer.New(businessLogic))

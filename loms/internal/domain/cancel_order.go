@@ -4,8 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-
-	"github.com/jackc/pgx/v5"
 )
 
 var (
@@ -24,7 +22,7 @@ func (m *LomsDomain) CancelOrder(ctx context.Context, orderId int64) error {
 		return ErrCancelOrderWrongStatus
 	}
 
-	err = m.lomsRepository.RunTransaction(ctx, pgx.ReadCommitted, func(tx context.Context) error {
+	err = m.lomsRepository.RunReadCommitedTransaction(ctx, func(tx context.Context) error {
 		if err := m.lomsRepository.UpdateOrderStatus(tx, orderId, "ORDER_CANCELLED"); err != nil {
 			log.Println(err)
 			return ErrCancelOrderUpdateFailed

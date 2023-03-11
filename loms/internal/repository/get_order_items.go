@@ -10,7 +10,7 @@ import (
 )
 
 func (r repository) GetOrderItems(ctx context.Context, orderId int64) ([]domain.OrderItem, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 	query, args, err := sq.
 		Select("sku", "count").
 		From("order_items").

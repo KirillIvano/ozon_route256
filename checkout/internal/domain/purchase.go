@@ -8,21 +8,20 @@ import (
 )
 
 func (m *CheckoutDomain) Purchase(ctx context.Context, userId int64) error {
-	// TODO temporary variable, delete when database appears
-	itemsMock := []CartItem{
-		{
-			UserId: 2,
-			Sku:    2,
-			Count:  3,
-		},
+	items, err := m.repository.GetCartItems(ctx, int64(userId))
+	if err != nil {
+		return errors.Wrap(err, "getting items from database")
 	}
-
-	items := itemsMock
 	orderId, err := m.lomsService.CreateOrder(ctx, userId, items)
-
 	if err != nil {
 		return errors.Wrap(err, "failed to create order")
 	}
+
+	// Подчищаем корзину, не влияет на основной пайплайн
+	// TODO: подумать, оставить ли так или сделать другой механизм, как временный норм
+	err = m.repository.DeleteCart(ctx, userId)
+	fmt.Println("deletion error", err)
+
 	fmt.Printf("order with id %d has been created\n", orderId)
 
 	return nil

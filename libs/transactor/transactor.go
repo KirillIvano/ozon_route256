@@ -17,14 +17,14 @@ type TransactionManager struct {
 	conn *pgx.Conn
 }
 
-type txkey string
+type TxKey string
 
-const key = txkey("tx")
+const key = TxKey("__txManager__")
 
 func (tm *TransactionManager) RunTransaction(ctx context.Context, level pgx.TxIsoLevel, fx func(ctxTX context.Context) error) error {
 	tx, err := tm.conn.BeginTx(ctx,
 		pgx.TxOptions{
-			IsoLevel: pgx.RepeatableRead,
+			IsoLevel: level,
 		})
 	if err != nil {
 		return err

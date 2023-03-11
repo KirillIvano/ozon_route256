@@ -35,7 +35,7 @@ func (impl *implementation) DeleteFromCart(ctx context.Context, req *checkoutSer
 		return nil, err
 	}
 
-	err := impl.checkoutDomain.DeleteFromCart(req.User, req.Sku, req.Count)
+	err := impl.checkoutDomain.DeleteFromCart(ctx, req.User, req.Sku, req.Count)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "deletion failed")

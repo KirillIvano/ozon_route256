@@ -11,28 +11,16 @@ type ListCartResponse struct {
 	TotalPrice uint32
 }
 
-func (m *CheckoutDomain) ListCart(user uint32) (ListCartResponse, error) {
-	itemsMock := []CartItem{
-		{
-			UserId: 2,
-			Sku:    1148162,
-			Count:  3,
-		},
-		{
-			UserId: 2,
-			Sku:    1625903,
-			Count:  3,
-		},
+func (m *CheckoutDomain) ListCart(ctx context.Context, userId uint32) (*ListCartResponse, error) {
+	items, err := m.repository.GetCartItems(ctx, int64(userId))
+	if err != nil {
+		return nil, errors.Wrap(err, "getting items from database")
 	}
-	items := itemsMock
 
 	res := make([]Offer, len(items))
 
 	var priceChan = make(chan uint32)
 	var errChan = make(chan error)
-
-	// TODO: убрать
-	ctx := context.Background()
 
 	for idx, item := range items {
 		go func(idx int, item CartItem) {
@@ -59,11 +47,11 @@ func (m *CheckoutDomain) ListCart(user uint32) (ListCartResponse, error) {
 		case price := <-priceChan:
 			totalPrice += price
 		case err := <-errChan:
-			return ListCartResponse{}, errors.Wrap(err, "fetching products")
+			return nil, errors.Wrap(err, "fetching products")
 		}
 	}
 
-	return ListCartResponse{
+	return &ListCartResponse{
 		Offers:     res,
 		TotalPrice: totalPrice,
 	}, nil

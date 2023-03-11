@@ -9,7 +9,7 @@ import (
 )
 
 func (r repository) GetReservations(ctx context.Context, orderId int64) ([]schema.Reservation, error) {
-	conn := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 	query, args, err := sq.
 		Select("warehouse_id", "order_id", "sku", "count").
 		From("reservation").

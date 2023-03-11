@@ -9,7 +9,7 @@ import (
 )
 
 func (r repository) CreateOrderItems(ctx context.Context, orderId int64, items []domain.OrderItem) error {
-	engine := r.ConnManager.GetQueryEngine(ctx)
+	engine := r.connManager.GetQueryEngine(ctx)
 
 	sql := sq.
 		Insert("order_items").

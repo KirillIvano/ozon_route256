@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/jackc/pgx/v5"
 	"github.com/pkg/errors"
 )
 
@@ -25,7 +24,7 @@ func (m *LomsDomain) SetOrderPayed(ctx context.Context, orderId int64) error {
 		return ErrCancelOrderWrongStatus
 	}
 
-	err = m.lomsRepository.RunTransaction(ctx, pgx.ReadCommitted, func(ctxTX context.Context) error {
+	err = m.lomsRepository.RunReadCommitedTransaction(ctx, func(ctxTX context.Context) error {
 		if err := m.lomsRepository.ApplyOrderReservations(ctx, orderId); err != nil {
 			return errors.Wrap(err, "reservations apply failed")
 		}

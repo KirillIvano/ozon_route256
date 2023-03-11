@@ -9,7 +9,7 @@ import (
 )
 
 func (r repository) CreateReservation(ctx context.Context, reservations []domain.Reservation) error {
-	engine := r.ConnManager.GetQueryEngine(ctx)
+	conn := r.connManager.GetQueryEngine(ctx)
 
 	sql := sq.
 		Insert("reservation").
@@ -24,7 +24,7 @@ func (r repository) CreateReservation(ctx context.Context, reservations []domain
 		return err
 	}
 
-	_, err = engine.Exec(ctx, query, args...)
+	_, err = conn.Exec(ctx, query, args...)
 	if err != nil {
 		return errors.Wrap(err, "failed creating reservations")
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func (r repository) ApplyOrderReservations(ctx context.Context, orderId int64) error {
-	engine := r.ConnManager.GetQueryEngine(ctx)
+	engine := r.connManager.GetQueryEngine(ctx)
 
 	reservations, err := r.GetReservations(ctx, orderId)
 	if err != nil {

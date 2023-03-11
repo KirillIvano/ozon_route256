@@ -11,14 +11,22 @@ type ProductService interface {
 	GetProduct(ctx context.Context, sku uint32) (ProductInfo, error)
 }
 
+type CheckoutRepository interface {
+	DeleteCart(ctx context.Context, userId int64) error
+	GetCartItems(ctx context.Context, userId int64) ([]CartItem, error)
+	DeleteItem(ctx context.Context, userId int64, sku uint32, count uint32) error
+	AddToCart(ctx context.Context, userId int64, sku uint32, count uint32) error
+}
 type CheckoutDomain struct {
 	lomsService    LomsService
 	productService ProductService
+	repository     CheckoutRepository
 }
 
-func New(lomsService LomsService, productService ProductService) *CheckoutDomain {
+func New(lomsService LomsService, productService ProductService, repository CheckoutRepository) *CheckoutDomain {
 	return &CheckoutDomain{
 		lomsService:    lomsService,
 		productService: productService,
+		repository:     repository,
 	}
 }
