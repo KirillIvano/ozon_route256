@@ -1,0 +1,5 @@
+token: <YOUR_TOKEN>
+services:
+  loms: loms:8081
+  products: route256.pavl.uk:8082
+  database: postgres://user:password@loms_bouncer:5432/loms?sslmode=disable

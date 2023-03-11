@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"route256/loms/internal/config"
 	"route256/loms/internal/domain"
 	lomsServer "route256/loms/internal/loms_server"
 	"route256/loms/internal/repository"
@@ -16,12 +17,17 @@ import (
 )
 
 const PORT = "8081"
-const CONNECTION_STRING = "postgres://user:password@localhost:8091/loms?sslmode=disable"
 
 func main() {
 	ctx := context.Background()
 
-	conn, err := pgx.Connect(ctx, CONNECTION_STRING)
+	err := config.Init()
+	if err != nil {
+		fmt.Println(err)
+		log.Fatal("config init failed")
+	}
+
+	conn, err := pgx.Connect(ctx, config.ConfigData.Services.Database)
 	if err != nil {
 		log.Fatal(err)
 	}

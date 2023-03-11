@@ -19,7 +19,6 @@ import (
 )
 
 const PORT = "8080"
-const CONNECTION_STRING = "postgres://user:password@localhost:8090/checkout?sslmode=disable"
 
 func main() {
 	ctx := context.Background()
@@ -29,7 +28,7 @@ func main() {
 		log.Fatal("config init failed")
 	}
 
-	conn, err := pgx.Connect(ctx, CONNECTION_STRING)
+	conn, err := pgx.Connect(ctx, config.ConfigData.Services.Database)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -2,7 +2,7 @@ version: "3.1"
 
 services:
   checkout_pg:
-    image: postgres
+    image: postgres:12
     restart: unless-stopped
     environment:
       POSTGRES_DB: checkout
@@ -10,15 +10,31 @@ services:
       POSTGRES_PASSWORD: password
       PGDATA: "/var/lib/postgresql/data/pgdata"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d example"]
+      test: ["CMD-SHELL", "pg_isready -U user -d checkout"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    ports:
+      - "8090:5432"
     volumes:
       - ./checkout:/var/lib/postgresql/data
+    networks:
+      - checkout
+
+  checkout_bouncer:
+    image: edoburu/pgbouncer
+    environment:
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=checkout_pg
+      - DB_NAME=checkout
+      - POOL_MODE=transaction
+      - ADMIN_USERS=postgres
     ports:
-      - 8090:5432
+      - "5432:5432"
+    depends_on:
+      - checkout_pg
     networks:
       - checkout
 
@@ -26,25 +42,16 @@ services:
     image: checkout
     build: ./checkout/
     restart: unless-stopped
-    depends_on:
-      - checkout_pg
     ports:
       - "8080:8080"
+    depends_on:
+      - checkout_bouncer
     networks:
       - checkout
+      - outer
 
-  loms:
-    image: loms
-    build: ./loms/
-    restart: unless-stopped
-    depends_on:
-      - loms_pg
-    ports:
-      - "8081:8081"
-    networks:
-      - loms
   loms_pg:
-    image: postgres
+    image: postgres:12
     restart: unless-stopped
     environment:
       POSTGRES_DB: loms
@@ -52,19 +59,52 @@ services:
       POSTGRES_PASSWORD: password
       PGDATA: "/var/lib/postgresql/data/pgdata"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d example"]
+      test: ["CMD-SHELL", "pg_isready -U user -d loms"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    ports:
+      - "8091:5432"
     volumes:
       - ./loms:/var/lib/postgresql/data
-    ports:
-      - 8091:5432
     networks:
       - loms
 
+  loms_bouncer:
+    image: edoburu/pgbouncer
+    environment:
+      - DB_USER=user
+      - DB_PASSWORD=password
+      - DB_HOST=loms_pg
+      - DB_NAME=loms
+      - POOL_MODE=transaction
+      - ADMIN_USERS=postgres
+    depends_on:
+      - loms_pg
+    networks:
+      - loms
+
+  loms:
+    image: loms
+    build: ./loms/
+    restart: unless-stopped
+    depends_on:
+      - loms_bouncer
+    ports:
+      - "8081:8081"
+    networks:
+      - loms
+      - outer
+
 
 networks:
-  checkout: {}
-  loms: {}
+  checkout: {
+    driver: bridge
+  }
+  loms: {
+    driver: bridge
+  }
+  outer: {
+    driver: bridge
+  }

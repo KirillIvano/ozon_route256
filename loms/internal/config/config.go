@@ -8,14 +8,11 @@ import (
 )
 
 type ServicesConfig struct {
-	Loms     string `yaml:"loms"`
-	Products string `yaml:"products"`
 	Database string `yaml:"database"`
 }
 
 type ConfigStruct struct {
 	Services ServicesConfig `yaml:"services"`
-	Token    string         `omitempty,yaml:"token"`
 }
 
 var ConfigData ConfigStruct

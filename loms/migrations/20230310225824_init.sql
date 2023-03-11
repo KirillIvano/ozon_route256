@@ -21,7 +21,7 @@ create table if not exists reservation (
     primary key (warehouse_id, order_id, sku)
 );
 
-create table if not exists loms_order (
+create table if not exists user_order (
     order_id bigserial primary key,
     user_id int8 not null,
     order_status text not null,
@@ -33,7 +33,7 @@ create table if not exists loms_order (
 -- +goose Down
 -- +goose StatementBegin    
 
-drop table if exists loms_order;
+drop table if exists user_order;
 drop table if exists reservation;
 drop table if exists warehouse_items;
 drop table if exists warehouse;
