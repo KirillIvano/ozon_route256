@@ -1,17 +1,70 @@
 version: "3.1"
+
 services:
+  checkout_pg:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: checkout
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d example"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./checkout:/var/lib/postgresql/data
+    ports:
+      - 8090:5432
+    networks:
+      - checkout
+
   checkout:
     image: checkout
     build: ./checkout/
+    restart: unless-stopped
+    depends_on:
+      - checkout_pg
     ports:
       - "8080:8080"
+    networks:
+      - checkout
+
   loms:
     image: loms
     build: ./loms/
+    restart: unless-stopped
+    depends_on:
+      - loms_pg
     ports:
       - "8081:8081"
-  # notification:
-  #   image: notification
-  #   build: ./notification
-  #   ports:
-  #     - "8082:8082"
+    networks:
+      - loms
+  loms_pg:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: loms
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d example"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - ./loms:/var/lib/postgresql/data
+    ports:
+      - 8091:5432
+    networks:
+      - loms
+
+
+networks:
+  checkout: {}
+  loms: {}
