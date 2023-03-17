@@ -16,8 +16,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const PORT = "8081"
-
 func main() {
 	ctx := context.Background()
 
@@ -38,7 +36,7 @@ func main() {
 	repository := repository.Connect(conn)
 	domain := domain.New(repository)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", PORT))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
 	if err != nil {
 		log.Fatal("failed to listen: ", err)
 	}

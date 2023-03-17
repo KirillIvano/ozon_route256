@@ -16,6 +16,7 @@ type ServicesConfig struct {
 type ConfigStruct struct {
 	Services ServicesConfig `yaml:"services"`
 	Token    string         `omitempty,yaml:"token"`
+	Port     int32          `omitempty,yaml:"port"`
 }
 
 var ConfigData ConfigStruct

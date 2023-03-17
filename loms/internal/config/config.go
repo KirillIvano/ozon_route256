@@ -13,6 +13,7 @@ type ServicesConfig struct {
 
 type ConfigStruct struct {
 	Services ServicesConfig `yaml:"services"`
+	Port     int32          `omitempty,yaml:"port"`
 }
 
 var ConfigData ConfigStruct

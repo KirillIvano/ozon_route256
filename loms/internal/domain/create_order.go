@@ -95,11 +95,11 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 	// В зависимости от результата резервации выставляем статус
 	if err != nil {
 		log.Println(err)
-		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, "ORDER_FAILED"); err != nil {
+		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusFailed); err != nil {
 			return 0, errors.Wrap(err, "updating failed order status")
 		}
 	} else {
-		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, "ORDER_AWAITING_PAYMENT"); err != nil {
+		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusAwaitingPayment); err != nil {
 			return 0, errors.Wrap(err, "updating successful order status")
 		}
 	}

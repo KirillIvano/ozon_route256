@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"route256/loms/internal/domain"
 	"time"
 
 	sq "github.com/Masterminds/squirrel"
@@ -15,7 +16,7 @@ func (r repository) CreateOrder(ctx context.Context, userId int64) (int64, error
 
 	query, args, err := sq.Insert("loms_order").
 		Columns("user_id", "order_status", "created_at").
-		Values(userId, "ORDER_NEW", time.Now()).
+		Values(userId, domain.OrderStatusNew, time.Now()).
 		Suffix("RETURNING order_id").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()

@@ -24,3 +24,12 @@ type Reservation struct {
 	Sku         uint32
 	Count       int32
 }
+
+var (
+	OrderStatusUnknown         = "ORDER_UNSPECIFIED"
+	OrderStatusNew             = "ORDER_NEW"
+	OrderStatusAwaitingPayment = "ORDER_AWAITING_PAYMENT"
+	OrderStatusFailed          = "ORDER_FAILED"
+	OrderStatusPayed           = "ORDER_PAYED"
+	OrderStatusCancelled       = "ORDER_CANCELLED"
+)

@@ -18,8 +18,6 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const PORT = "8080"
-
 func main() {
 	ctx := context.Background()
 
@@ -49,7 +47,7 @@ func main() {
 
 	businessLogic := domain.New(lomsClient, productClient, repository)
 
-	listener, err := net.Listen("tcp", fmt.Sprintf(":%s", PORT))
+	listener, err := net.Listen("tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
 	if err != nil {
 		log.Fatal("failed to listen: ", err)
 	}

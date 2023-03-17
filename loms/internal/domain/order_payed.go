@@ -20,7 +20,7 @@ func (m *LomsDomain) SetOrderPayed(ctx context.Context, orderId int64) error {
 	}
 
 	fmt.Println(status)
-	if status != "ORDER_AWAITING_PAYMENT" {
+	if status != OrderStatusAwaitingPayment {
 		return ErrCancelOrderWrongStatus
 	}
 
@@ -35,7 +35,7 @@ func (m *LomsDomain) SetOrderPayed(ctx context.Context, orderId int64) error {
 		}
 		log.Println("payment: cleared reservations")
 
-		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, "ORDER_PAYED"); err != nil {
+		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusPayed); err != nil {
 			return errors.Wrap(err, "status update failed")
 		}
 		log.Println("payment: updated status")

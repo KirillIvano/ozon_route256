@@ -1,2 +1,3 @@
+port: 8081
 services:
   database: postgres://user:password@loms_bouncer:5432/loms?sslmode=disable

@@ -18,12 +18,12 @@ func (m *LomsDomain) CancelOrder(ctx context.Context, orderId int64) error {
 		return err
 	}
 
-	if status == "ORDER_CANCELLED" || status == "ORDER_COMPLETED" {
+	if status == OrderStatusCancelled || status == OrderStatusPayed {
 		return ErrCancelOrderWrongStatus
 	}
 
 	err = m.lomsRepository.RunReadCommitedTransaction(ctx, func(tx context.Context) error {
-		if err := m.lomsRepository.UpdateOrderStatus(tx, orderId, "ORDER_CANCELLED"); err != nil {
+		if err := m.lomsRepository.UpdateOrderStatus(tx, orderId, OrderStatusPayed); err != nil {
 			log.Println(err)
 			return ErrCancelOrderUpdateFailed
 		}

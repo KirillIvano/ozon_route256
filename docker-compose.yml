@@ -99,12 +99,9 @@ services:
 
 
 networks:
-  checkout: {
+  checkout:
     driver: bridge
-  }
-  loms: {
+  loms:
     driver: bridge
-  }
-  outer: {
+  outer:
     driver: bridge
-  }
