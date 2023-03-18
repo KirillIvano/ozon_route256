@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 	"route256/loms/internal/domain"
 
 	sq "github.com/Masterminds/squirrel"
@@ -18,8 +17,6 @@ func (r repository) GetOutdatedOrders(ctx context.Context) ([]int64, error) {
 		Where("order_status = ? and now() > updated_at + interval '10 minutes'", domain.OrderStatusAwaitingPayment).
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
-
-	fmt.Println(query)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "forming get outdated orders query")
