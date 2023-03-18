@@ -3,9 +3,9 @@ package products_client
 import (
 	"context"
 	"log"
+	"route256/checkout/pkg/rate_limiter"
 	productsService "route256/products/pkg/products_service"
 
-	"go.uber.org/ratelimit"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -13,7 +13,7 @@ import (
 type client struct {
 	token string
 
-	rateLimiter ratelimit.Limiter
+	rateLimiter rate_limiter.RateLimiter
 	client      productsService.ProductServiceClient
 	conn        *grpc.ClientConn
 }
@@ -31,12 +31,12 @@ func New(ctx context.Context, urlOrigin string, token string) *client {
 	}
 
 	c := productsService.NewProductServiceClient(conn)
-	rateLimiter := ratelimit.New(RpsLimit)
+	rateLimiter := rate_limiter.New(RpsLimit)
 
 	return &client{
 		token:       token,
 		client:      c,
 		conn:        conn,
-		rateLimiter: rateLimiter,
+		rateLimiter: *rateLimiter,
 	}
 }
