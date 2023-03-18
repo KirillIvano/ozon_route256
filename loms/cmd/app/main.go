@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func startListen(ctx context.Context, domain *domain.LomsDomain) {
+func startServer(ctx context.Context, businessLogic *domain.LomsDomain) {
 	netListener := net.ListenConfig{}
 	listener, err := netListener.Listen(ctx, "tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
 	if err != nil {
@@ -27,11 +27,28 @@ func startListen(ctx context.Context, domain *domain.LomsDomain) {
 	}
 
 	grpcServer := grpc.NewServer()
-	lomsService.RegisterLomsServer(grpcServer, lomsServer.New(domain))
+	lomsService.RegisterLomsServer(grpcServer, lomsServer.New(businessLogic))
 	reflection.Register(grpcServer)
 
-	if err := grpcServer.Serve(listener); err != nil {
-		log.Fatal("failed to serve: ", err)
+	serverDone := make(chan struct{})
+	defer close(serverDone)
+
+	go func() {
+		defer func() { serverDone <- struct{}{} }()
+
+		if err := grpcServer.Serve(listener); err != nil {
+			log.Fatal("failed to serve: ", err)
+		}
+	}()
+
+	// ждем закрытия окончания работы сервера
+	for {
+		select {
+		case <-serverDone:
+			return
+		case <-ctx.Done():
+			grpcServer.GracefulStop()
+		}
 	}
 }
 
@@ -61,5 +78,5 @@ func main() {
 	enf.Start()
 	defer enf.Close()
 
-	startListen(ctx, domain)
+	startServer(ctx, domain)
 }
