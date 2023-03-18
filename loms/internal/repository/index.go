@@ -4,7 +4,7 @@ import (
 	"route256/libs/transactor"
 	"route256/loms/internal/domain"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type repository struct {
@@ -13,7 +13,7 @@ type repository struct {
 
 var _ domain.LomsRepository = (*repository)(nil)
 
-func Connect(conn *pgx.Conn) repository {
+func Connect(conn *pgxpool.Pool) repository {
 	return repository{
 		connManager: transactor.New(conn),
 	}

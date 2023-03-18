@@ -7,6 +7,7 @@ type Order struct {
 	UserId      int64     `db:"user_id"`
 	OrderStatus string    `db:"order_status"`
 	CreatedAt   time.Time `db:"created_at"`
+	UpdatedAt   time.Time `db:"updated_at"`
 }
 
 type WarehouseItem struct {

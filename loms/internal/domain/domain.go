@@ -19,6 +19,7 @@ type LomsRepository interface {
 	UpdateOrderStatus(ctx context.Context, orderId int64, status string) error
 	RunReadCommitedTransaction(ctx context.Context, fx func(ctxTX context.Context) error) error
 	GetOrderStatus(ctx context.Context, orderId int64) (string, error)
+	GetOutdatedOrders(ctx context.Context) ([]int64, error)
 }
 
 type LomsDomain struct {

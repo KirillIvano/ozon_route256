@@ -11,7 +11,10 @@ func (r repository) UpdateOrderStatus(ctx context.Context, orderId int64, status
 	conn := r.connManager.GetQueryEngine(ctx)
 
 	query, args, err := sq.Update("loms_order").
-		Set("order_status", status).
+		SetMap(map[string]any{
+			"order_status": status,
+			"updated_at":   sq.Expr("now()"),
+		}).
 		Where("order_id = ?", orderId).
 		PlaceholderFormat(sq.Dollar).ToSql()
 

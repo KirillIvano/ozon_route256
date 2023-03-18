@@ -24,6 +24,9 @@ func (impl *implementation) ListOrder(ctx context.Context, params *lomsService.L
 		return nil, err
 	}
 
+	// TODO: delete, just for testing
+	return nil, errors.New("some error")
+
 	orderInfo, err := impl.lomsDomain.ListOrder(ctx, params.OrderID)
 
 	if err != nil {
