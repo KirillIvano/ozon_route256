@@ -4,7 +4,7 @@ import (
 	"route256/checkout/internal/domain"
 	"route256/libs/transactor"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type repository struct {
@@ -13,7 +13,7 @@ type repository struct {
 
 var _ domain.CheckoutRepository = (*repository)(nil)
 
-func New(conn *pgx.Conn) repository {
+func New(conn *pgxpool.Pool) repository {
 	return repository{
 		connManager: transactor.New(conn),
 	}

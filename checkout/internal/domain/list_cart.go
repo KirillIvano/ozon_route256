@@ -11,6 +11,15 @@ type ListCartResponse struct {
 	TotalPrice uint32
 }
 
+// func EmulateRequest(ctx context.Context, someId uint32) (ProductInfo, error) {
+// 	select {
+// 	case <-time.After(2 * time.Second):
+// 		return ProductInfo{}, errors.New("timeout happened")
+// 	case <-ctx.Done():
+// 		return ProductInfo{}, errors.New("context fucked up")
+// 	}
+// }
+
 func (m *CheckoutDomain) ListCart(ctx context.Context, userId uint32) (*ListCartResponse, error) {
 	items, err := m.repository.GetCartItems(ctx, int64(userId))
 	if err != nil {
@@ -19,36 +28,53 @@ func (m *CheckoutDomain) ListCart(ctx context.Context, userId uint32) (*ListCart
 
 	res := make([]Offer, len(items))
 
-	var priceChan = make(chan uint32)
-	var errChan = make(chan error)
+	priceChan := make(chan uint32)
+	defer close(priceChan)
+
+	errChan := make(chan error)
+	defer close(errChan)
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	for idx, item := range items {
-		go func(idx int, item CartItem) {
-			product, err := m.productService.GetProduct(ctx, item.Sku)
+		currentIdx, currentItem := idx, item
+
+		m.wp.Run(func() {
+			product, err := m.productService.GetProduct(ctx, currentItem.Sku)
 
 			if err != nil {
 				errChan <- err
 				return
 			}
 
-			// разные области памяти, безопасно
-			res[idx] = Offer{
+			res[currentIdx] = Offer{
 				CartItem: item,
 				Price:    product.Price,
 				Name:     product.Name,
 			}
 			priceChan <- product.Price
-		}(idx, item)
+		})
 	}
 
 	totalPrice := uint32(0)
+	var firstError error
+
 	for i := 0; i < len(items); i++ {
 		select {
 		case price := <-priceChan:
 			totalPrice += price
 		case err := <-errChan:
-			return nil, errors.Wrap(err, "fetching products")
+			if firstError == nil {
+				firstError = err
+				// сообщаем контексту, что остальные запросы не нужны
+				cancel()
+			}
 		}
+	}
+
+	if firstError != nil {
+		return nil, errors.Wrap(firstError, "getting info from products service")
 	}
 
 	return &ListCartResponse{

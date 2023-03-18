@@ -3,4 +3,4 @@ port: 8080
 services:
   loms: loms:8081
   products: route256.pavl.uk:8082
-  database: postgres://user:password@checkout_bouncer:5432/checkout?sslmode=disable
+  database: postgres://user:password@checkout_pg:5432/checkout?sslmode=disable

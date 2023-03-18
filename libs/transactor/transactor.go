@@ -5,6 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type QueryEngine interface {
@@ -14,7 +15,7 @@ type QueryEngine interface {
 }
 
 type TransactionManager struct {
-	conn *pgx.Conn
+	conn *pgxpool.Pool
 }
 
 type TxKey string
@@ -49,7 +50,7 @@ func (tm *TransactionManager) GetQueryEngine(ctx context.Context) QueryEngine {
 	return tm.conn
 }
 
-func New(conn *pgx.Conn) *TransactionManager {
+func New(conn *pgxpool.Pool) *TransactionManager {
 	return &TransactionManager{
 		conn: conn,
 	}

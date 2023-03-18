@@ -22,22 +22,6 @@ services:
     networks:
       - checkout
 
-  checkout_bouncer:
-    image: edoburu/pgbouncer
-    environment:
-      - DB_USER=user
-      - DB_PASSWORD=password
-      - DB_HOST=checkout_pg
-      - DB_NAME=checkout
-      - POOL_MODE=transaction
-      - ADMIN_USERS=postgres
-    ports:
-      - "5432:5432"
-    depends_on:
-      - checkout_pg
-    networks:
-      - checkout
-
   checkout:
     image: checkout
     build: ./checkout/
@@ -45,7 +29,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - checkout_bouncer
+      - checkout_pg
     networks:
       - checkout
       - outer
@@ -71,26 +55,12 @@ services:
     networks:
       - loms
 
-  loms_bouncer:
-    image: edoburu/pgbouncer
-    environment:
-      - DB_USER=user
-      - DB_PASSWORD=password
-      - DB_HOST=loms_pg
-      - DB_NAME=loms
-      - POOL_MODE=transaction
-      - ADMIN_USERS=postgres
-    depends_on:
-      - loms_pg
-    networks:
-      - loms
-
   loms:
     image: loms
     build: ./loms/
     restart: unless-stopped
     depends_on:
-      - loms_bouncer
+      - loms_pg
     ports:
       - "8081:8081"
     networks:
