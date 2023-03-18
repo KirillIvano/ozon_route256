@@ -5,6 +5,7 @@ import (
 	"log"
 	productsService "route256/products/pkg/products_service"
 
+	"go.uber.org/ratelimit"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -12,13 +13,16 @@ import (
 type client struct {
 	token string
 
-	client productsService.ProductServiceClient
-	conn   *grpc.ClientConn
+	rateLimiter ratelimit.Limiter
+	client      productsService.ProductServiceClient
+	conn        *grpc.ClientConn
 }
 
 func (c *client) Close() {
 	c.conn.Close()
 }
+
+const RpsLimit = 10
 
 func New(ctx context.Context, urlOrigin string, token string) *client {
 	conn, err := grpc.DialContext(ctx, urlOrigin, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -27,10 +31,12 @@ func New(ctx context.Context, urlOrigin string, token string) *client {
 	}
 
 	c := productsService.NewProductServiceClient(conn)
+	rateLimiter := ratelimit.New(RpsLimit)
 
 	return &client{
-		token:  token,
-		client: c,
-		conn:   conn,
+		token:       token,
+		client:      c,
+		conn:        conn,
+		rateLimiter: rateLimiter,
 	}
 }
