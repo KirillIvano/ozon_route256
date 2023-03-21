@@ -25,7 +25,7 @@ func (impl *implementation) CancelOrder(ctx context.Context, params *lomsService
 		return nil, err
 	}
 
-	err := impl.lomsDomain.CancelOrder(params.OrderID)
+	err := impl.lomsDomain.CancelOrder(ctx, params.OrderID)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "cancellation failed")

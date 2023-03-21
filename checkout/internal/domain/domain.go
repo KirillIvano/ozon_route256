@@ -1,6 +1,9 @@
 package domain
 
-import "context"
+import (
+	"context"
+	workerPool "route256/checkout/pkg/worker_pool"
+)
 
 type LomsService interface {
 	Stocks(ctx context.Context, sku uint32) ([]Stock, error)
@@ -11,14 +14,24 @@ type ProductService interface {
 	GetProduct(ctx context.Context, sku uint32) (ProductInfo, error)
 }
 
+type CheckoutRepository interface {
+	DeleteCart(ctx context.Context, userId int64) error
+	GetCartItems(ctx context.Context, userId int64) ([]CartItem, error)
+	DeleteItem(ctx context.Context, userId int64, sku uint32, count uint32) error
+	AddToCart(ctx context.Context, userId int64, sku uint32, count uint32) error
+}
 type CheckoutDomain struct {
 	lomsService    LomsService
 	productService ProductService
+	repository     CheckoutRepository
+	wp             *workerPool.WorkerPool
 }
 
-func New(lomsService LomsService, productService ProductService) *CheckoutDomain {
+func New(lomsService LomsService, productService ProductService, repository CheckoutRepository, wp *workerPool.WorkerPool) *CheckoutDomain {
 	return &CheckoutDomain{
 		lomsService:    lomsService,
 		productService: productService,
+		repository:     repository,
+		wp:             wp,
 	}
 }

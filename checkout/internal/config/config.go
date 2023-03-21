@@ -10,11 +10,13 @@ import (
 type ServicesConfig struct {
 	Loms     string `yaml:"loms"`
 	Products string `yaml:"products"`
+	Database string `yaml:"database"`
 }
 
 type ConfigStruct struct {
 	Services ServicesConfig `yaml:"services"`
 	Token    string         `omitempty,yaml:"token"`
+	Port     int32          `omitempty,yaml:"port"`
 }
 
 var ConfigData ConfigStruct

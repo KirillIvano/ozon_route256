@@ -24,7 +24,7 @@ func (impl *implementation) ListCart(ctx context.Context, req *checkoutService.L
 		return nil, err
 	}
 
-	res, err := impl.checkoutDomain.ListCart(uint32(req.User))
+	res, err := impl.checkoutDomain.ListCart(ctx, uint32(req.User))
 
 	if err != nil {
 		return nil, errors.Wrap(err, "getting failed")

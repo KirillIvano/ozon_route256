@@ -38,7 +38,7 @@ func (impl *implementation) AddToCart(ctx context.Context, req *checkoutService.
 	err := impl.checkoutDomain.AddToCart(ctx, req.User, req.Sku, req.Count)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "creation failed")
+		return nil, errors.Wrap(err, "add to cart failed")
 	}
 
 	return &emptypb.Empty{}, nil
