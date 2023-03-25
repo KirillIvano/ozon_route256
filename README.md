@@ -10,3 +10,8 @@
     make build-all # Билдит все сервисы в монорепе
     make run-all # Запускает все сервисы с помощью docker-compose
 ```
+# TODO
+
+* create ci file
+* take env variables from arguments and .env
+* run database on remote server

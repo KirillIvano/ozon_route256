@@ -10,7 +10,11 @@ service Checkout {
     rpc AddToCart (AddToCartParams) returns (google.protobuf.Empty) {};
     rpc DeleteFromCart (DeleteFromCartParams) returns (google.protobuf.Empty) {};
     rpc ListCart (ListCartParams) returns (ListCartResponse) {};
-    rpc Purchase (PurchaseParams) returns (google.protobuf.Empty) {};
+    rpc Purchase (PurchaseParams) returns (PurchaseResponse) {};
+}
+
+message PurchaseResponse {
+    int64 orderId = 1;
 }
 
 message AddToCartParams {

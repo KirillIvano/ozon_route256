@@ -3,6 +3,7 @@ package loms_client
 import (
 	"context"
 	"log"
+	"route256/checkout/internal/domain"
 	lomsService "route256/loms/pkg/loms_service"
 
 	"google.golang.org/grpc"
@@ -16,6 +17,11 @@ type Client struct {
 
 func (c *Client) Close() {
 	c.conn.Close()
+}
+
+type LomsClient interface {
+	CreateOrder(ctx context.Context, user int64, items []domain.CartItem) (int64, error)
+	Stocks(ctx context.Context, sku uint32) ([]domain.Stock, error)
 }
 
 func New(ctx context.Context, urlOrigin string) *Client {

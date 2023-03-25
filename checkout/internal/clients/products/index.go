@@ -3,6 +3,7 @@ package products_client
 import (
 	"context"
 	"log"
+	"route256/checkout/internal/domain"
 	"route256/checkout/pkg/rate_limiter"
 	productsService "route256/products/pkg/products_service"
 
@@ -16,6 +17,10 @@ type client struct {
 	rateLimiter rate_limiter.RateLimiter
 	client      productsService.ProductServiceClient
 	conn        *grpc.ClientConn
+}
+
+type ProductsClient interface {
+	GetProduct(ctx context.Context, sku uint32) (domain.ProductInfo, error)
 }
 
 func (c *client) Close() {
