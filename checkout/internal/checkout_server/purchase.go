@@ -5,7 +5,6 @@ import (
 	checkoutService "route256/checkout/pkg/checkout_service"
 
 	"github.com/pkg/errors"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -20,16 +19,16 @@ func ValidatePurchaseRequest(r *checkoutService.PurchaseParams) error {
 	return nil
 }
 
-func (impl *implementation) Purchase(ctx context.Context, req *checkoutService.PurchaseParams) (*emptypb.Empty, error) {
+func (impl *implementation) Purchase(ctx context.Context, req *checkoutService.PurchaseParams) (*checkoutService.PurchaseResponse, error) {
 	if err := ValidatePurchaseRequest(req); err != nil {
 		return nil, err
 	}
 
-	err := impl.checkoutDomain.Purchase(ctx, req.User)
+	orderId, err := impl.checkoutDomain.Purchase(ctx, req.User)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "purchase failed")
 	}
 
-	return &emptypb.Empty{}, nil
+	return &checkoutService.PurchaseResponse{OrderId: orderId}, nil
 }

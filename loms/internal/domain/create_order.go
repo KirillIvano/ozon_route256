@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"log"
 	"math"
 
 	"github.com/pkg/errors"
@@ -13,7 +12,7 @@ var (
 	ErrorReservationNotEnoughItems = errors.New("not enough items")
 )
 
-func calculateItemReservation(item OrderItem, stocks []Stock, orderId int64) ([]Reservation, error) {
+func CalculateItemReservation(item OrderItem, stocks []Stock, orderId int64) ([]Reservation, error) {
 	reservations := make([]Reservation, 0)
 	currentCnt := int32(item.Count)
 
@@ -43,7 +42,7 @@ func calculateItemReservation(item OrderItem, stocks []Stock, orderId int64) ([]
 	return reservations, nil
 }
 
-func (m LomsDomain) createOrderReservations(ctx context.Context, orderId int64, items []OrderItem) error {
+func (m LomsDomain) CreateOrderReservations(ctx context.Context, orderId int64, items []OrderItem) error {
 	reservations := make([]Reservation, 0, len(items))
 
 	for _, item := range items {
@@ -52,9 +51,7 @@ func (m LomsDomain) createOrderReservations(ctx context.Context, orderId int64, 
 			return err
 		}
 
-		log.Println(stocks)
-
-		itemReservations, err := calculateItemReservation(item, stocks, orderId)
+		itemReservations, err := CalculateItemReservation(item, stocks, orderId)
 		if err != nil {
 			return err
 		}
@@ -65,6 +62,20 @@ func (m LomsDomain) createOrderReservations(ctx context.Context, orderId int64, 
 	err := m.lomsRepository.CreateReservation(ctx, reservations)
 
 	return err
+}
+
+func (m LomsDomain) CreateOrderItemsTransaction(ctx context.Context, orderId int64, items []OrderItem) error {
+	err := m.lomsRepository.CreateOrderItems(ctx, orderId, items)
+	if err != nil {
+		return errors.Wrap(err, "creating order items")
+	}
+
+	err = m.CreateOrderReservations(ctx, orderId, items)
+	if err != nil {
+		return errors.Wrap(err, "creating order reservations")
+	}
+
+	return nil
 }
 
 func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderItem) (int64, error) {
@@ -79,22 +90,11 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 
 	// Сохраняем элементы заказа и резервируем под них места на складах
 	err = m.lomsRepository.RunReadCommitedTransaction(ctx, func(ctxTX context.Context) error {
-		err := m.lomsRepository.CreateOrderItems(ctx, orderId, items)
-		if err != nil {
-			return errors.Wrap(err, "creating order items")
-		}
-
-		err = m.createOrderReservations(ctx, orderId, items)
-		if err != nil {
-			return errors.Wrap(err, "creating order reservations")
-		}
-
-		return nil
+		return m.CreateOrderItemsTransaction(ctx, orderId, items)
 	})
 
 	// В зависимости от результата резервации выставляем статус
 	if err != nil {
-		log.Println(err)
 		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusFailed); err != nil {
 			return 0, errors.Wrap(err, "updating failed order status")
 		}

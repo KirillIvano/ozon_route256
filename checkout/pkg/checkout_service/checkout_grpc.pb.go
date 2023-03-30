@@ -26,7 +26,7 @@ type CheckoutClient interface {
 	AddToCart(ctx context.Context, in *AddToCartParams, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteFromCart(ctx context.Context, in *DeleteFromCartParams, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListCart(ctx context.Context, in *ListCartParams, opts ...grpc.CallOption) (*ListCartResponse, error)
-	Purchase(ctx context.Context, in *PurchaseParams, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Purchase(ctx context.Context, in *PurchaseParams, opts ...grpc.CallOption) (*PurchaseResponse, error)
 }
 
 type checkoutClient struct {
@@ -64,8 +64,8 @@ func (c *checkoutClient) ListCart(ctx context.Context, in *ListCartParams, opts 
 	return out, nil
 }
 
-func (c *checkoutClient) Purchase(ctx context.Context, in *PurchaseParams, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *checkoutClient) Purchase(ctx context.Context, in *PurchaseParams, opts ...grpc.CallOption) (*PurchaseResponse, error) {
+	out := new(PurchaseResponse)
 	err := c.cc.Invoke(ctx, "/checkout.Checkout/Purchase", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -80,7 +80,7 @@ type CheckoutServer interface {
 	AddToCart(context.Context, *AddToCartParams) (*emptypb.Empty, error)
 	DeleteFromCart(context.Context, *DeleteFromCartParams) (*emptypb.Empty, error)
 	ListCart(context.Context, *ListCartParams) (*ListCartResponse, error)
-	Purchase(context.Context, *PurchaseParams) (*emptypb.Empty, error)
+	Purchase(context.Context, *PurchaseParams) (*PurchaseResponse, error)
 	mustEmbedUnimplementedCheckoutServer()
 }
 
@@ -97,7 +97,7 @@ func (UnimplementedCheckoutServer) DeleteFromCart(context.Context, *DeleteFromCa
 func (UnimplementedCheckoutServer) ListCart(context.Context, *ListCartParams) (*ListCartResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListCart not implemented")
 }
-func (UnimplementedCheckoutServer) Purchase(context.Context, *PurchaseParams) (*emptypb.Empty, error) {
+func (UnimplementedCheckoutServer) Purchase(context.Context, *PurchaseParams) (*PurchaseResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Purchase not implemented")
 }
 func (UnimplementedCheckoutServer) mustEmbedUnimplementedCheckoutServer() {}
