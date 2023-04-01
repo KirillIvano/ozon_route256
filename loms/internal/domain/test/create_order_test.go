@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"route256/loms/internal/domain"
+	"route256/loms/internal/order_sender/mocks"
 	mRepo "route256/loms/internal/repository/mocks"
 	"testing"
 
@@ -26,9 +27,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.CreateOrderItemsMock.When(ctx, 100, orderItems).Then(nil)
 		repository.ListStocksMock.Set(func(ctx context.Context, sku uint32) (sa1 []domain.Stock, err error) {
@@ -61,9 +64,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(0, testError)
 
 		_, err := model.CreateOrder(ctx, 10, orderItems)
@@ -77,9 +82,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.CreateOrderItemsMock.When(ctx, 100, orderItems).Then(testError)
 
@@ -94,9 +101,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.CreateOrderItemsMock.When(ctx, 100, orderItems).Then(nil)
 		repository.ListStocksMock.Set(func(ctx context.Context, sku uint32) (sa1 []domain.Stock, err error) {
@@ -114,9 +123,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.CreateOrderItemsMock.When(ctx, 100, orderItems).Then(nil)
 		repository.ListStocksMock.Set(func(ctx context.Context, sku uint32) (sa1 []domain.Stock, err error) {
@@ -143,9 +154,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.RunReadCommitedTransactionMock.Set(func(c context.Context, fx func(ctxTX context.Context) error) (err error) {
 			return nil
@@ -165,9 +178,11 @@ func TestCreateOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.CreateOrderMock.When(ctx, 10).Then(100, nil)
 		repository.RunReadCommitedTransactionMock.Set(func(c context.Context, fx func(ctxTX context.Context) error) (err error) {
 			return testError
@@ -186,8 +201,11 @@ func TestCreateOrder(t *testing.T) {
 
 		ctx := context.Background()
 		controller := minimock.NewController(t)
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
+
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 
 		_, err := model.CreateOrder(ctx, 10, []domain.OrderItem{})
 

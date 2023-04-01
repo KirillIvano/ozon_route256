@@ -22,12 +22,18 @@ type LomsRepository interface {
 	GetOutdatedOrders(ctx context.Context) ([]int64, error)
 }
 
-type LomsDomain struct {
-	lomsRepository LomsRepository
+type OrderSender interface {
+	SendOrder(ctx context.Context, orderId int64, orderStatus string) error
 }
 
-func New(lomsRepository LomsRepository) *LomsDomain {
+type LomsDomain struct {
+	lomsRepository LomsRepository
+	orderSender    OrderSender
+}
+
+func New(lomsRepository LomsRepository, sender OrderSender) *LomsDomain {
 	return &LomsDomain{
 		lomsRepository: lomsRepository,
+		orderSender:    sender,
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"route256/loms/internal/domain"
+	"route256/loms/internal/order_sender/mocks"
 	mRepo "route256/loms/internal/repository/mocks"
 	"testing"
 
@@ -20,9 +21,11 @@ func TestListOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.GetOrderInfoMock.When(ctx, 10).Then(&domain.OrderInfo{
 			Status: domain.OrderStatusAwaitingPayment,
 			User:   10,
@@ -40,9 +43,11 @@ func TestListOrder(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.GetOrderInfoMock.When(ctx, 10).Then(&domain.OrderInfo{}, testError)
 
 		_, err := model.ListOrder(ctx, 10)

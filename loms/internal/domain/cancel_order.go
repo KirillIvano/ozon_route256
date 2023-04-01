@@ -2,7 +2,8 @@ package domain
 
 import (
 	"context"
-	"errors"
+
+	"github.com/pkg/errors"
 )
 
 var (
@@ -11,12 +12,17 @@ var (
 )
 
 func (m *LomsDomain) ClearOrderInfoTransaction(tx context.Context, orderId int64) error {
-	if err := m.lomsRepository.UpdateOrderStatus(tx, orderId, OrderStatusPayed); err != nil {
+	if err := m.lomsRepository.UpdateOrderStatus(tx, orderId, OrderStatusCancelled); err != nil {
 		return ErrCancelOrderUpdateFailed
 	}
 
 	if err := m.lomsRepository.ClearReservations(tx, orderId); err != nil {
 		return ErrCancelOrderUpdateFailed
+	}
+
+	err := m.orderSender.SendOrder(tx, orderId, OrderStatusCancelled)
+	if err != nil {
+		errors.Wrap(err, "failed to send new order status")
 	}
 
 	return nil

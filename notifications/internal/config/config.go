@@ -7,15 +7,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type ServicesConfig struct {
-	Database string `yaml:"database"`
-}
-
 type ConfigStruct struct {
-	OrderTopic string         `omitempty,yaml:"order_topic"`
-	Brokers    []string       `omitempty,yaml:"brokers"`
-	Services   ServicesConfig `yaml:"services"`
-	Port       int32          `omitempty,yaml:"port"`
+	OrderTopic string   `yaml:"order_topic"`
+	Brokers    []string `yaml:"brokers"`
 }
 
 var ConfigData ConfigStruct

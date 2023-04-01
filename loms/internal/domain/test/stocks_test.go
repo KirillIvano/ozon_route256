@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"route256/loms/internal/domain"
+	"route256/loms/internal/order_sender/mocks"
 	mRepo "route256/loms/internal/repository/mocks"
 	"testing"
 
@@ -20,16 +21,17 @@ func TestStocks(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
-		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
-
 		stocks := []domain.Stock{
 			{
 				WarehouseID: 1,
 				Count:       10,
 			},
 		}
+		sender := mocks.NewOrderSenderMock(controller)
+		repository := mRepo.NewLomsRepositoryMock(controller)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.ListStocksMock.When(ctx, 5).Then(stocks, nil)
 
 		res, err := model.Stocks(ctx, 5)
@@ -44,9 +46,11 @@ func TestStocks(t *testing.T) {
 		ctx := context.Background()
 		controller := minimock.NewController(t)
 
+		sender := mocks.NewOrderSenderMock(controller)
 		repository := mRepo.NewLomsRepositoryMock(controller)
-		model := domain.New(repository)
+		model := domain.New(repository, sender)
 
+		sender.SendOrderMock.Set(func(ctx context.Context, orderId int64, orderStatus string) (err error) { return nil })
 		repository.ListStocksMock.When(ctx, 5).Then(nil, testError)
 
 		_, err := model.Stocks(ctx, 5)
