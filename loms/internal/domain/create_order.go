@@ -89,7 +89,7 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 	}
 	err = m.orderSender.SendOrder(ctx, orderId, OrderStatusNew)
 	if err != nil {
-		errors.Wrap(err, "failed to send new order status")
+		return 0, errors.Wrap(err, "failed to send new order status")
 	}
 
 	// Сохраняем элементы заказа и резервируем под них места на складах
@@ -105,7 +105,7 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 
 		err = m.orderSender.SendOrder(ctx, orderId, OrderStatusFailed)
 		if err != nil {
-			errors.Wrap(err, "failed to send new order status")
+			return 0, errors.Wrap(err, "failed to send new order status")
 		}
 	} else {
 		if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusAwaitingPayment); err != nil {
@@ -114,7 +114,7 @@ func (m LomsDomain) CreateOrder(ctx context.Context, user int64, items []OrderIt
 
 		err = m.orderSender.SendOrder(ctx, orderId, OrderStatusAwaitingPayment)
 		if err != nil {
-			errors.Wrap(err, "failed to send new order status")
+			return 0, errors.Wrap(err, "failed to send new order status")
 		}
 	}
 

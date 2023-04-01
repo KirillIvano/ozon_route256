@@ -22,7 +22,7 @@ func (m *LomsDomain) ClearOrderInfoTransaction(tx context.Context, orderId int64
 
 	err := m.orderSender.SendOrder(tx, orderId, OrderStatusCancelled)
 	if err != nil {
-		errors.Wrap(err, "failed to send new order status")
+		return errors.Wrap(err, "failed to send new order status")
 	}
 
 	return nil

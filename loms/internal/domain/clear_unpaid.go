@@ -27,7 +27,7 @@ func (m LomsDomain) ClearUnpaid(ctx context.Context) error {
 
 			err = m.orderSender.SendOrder(txCtx, orderId, OrderStatusFailed)
 			if err != nil {
-				errors.Wrap(err, "failed to send new order status")
+				return errors.Wrap(err, "failed to send new order status")
 			}
 
 			return nil

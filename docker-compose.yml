@@ -19,9 +19,12 @@ services:
     - ZOOKEEPER_INIT_LIMIT=5
     - ZOOKEEPER_SYNC_LIMIT=2
     - ZOOKEEPER_SERVERS=zookeeper:2888:3888
+    networks:
+      - outer
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     healthcheck:
       test: ps augwwx | egrep [S]upportedKafka
     depends_on:
@@ -37,9 +40,12 @@ services:
     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
     - KAFKA_BROKER_ID=1
     - ZOOKEEPER=zookeeper:2181
+    networks:
+      - outer
 
   kafka1:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     healthcheck:
       test: ps augwwx | egrep [S]upportedKafka
     depends_on:
@@ -55,9 +61,12 @@ services:
     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
     - KAFKA_BROKER_ID=2
     - ZOOKEEPER=zookeeper:2181
+    networks:
+      - outer
 
   kafka2:
     image: confluentinc/cp-kafka:latest
+    restart: unless-stopped
     healthcheck:
       test: ps augwwx | egrep [S]upportedKafka
     depends_on:
@@ -73,6 +82,8 @@ services:
     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
     - KAFKA_BROKER_ID=3
     - ZOOKEEPER=zookeeper:2181
+    networks:
+      - outer
 
   checkout_pg:
     image: postgres:12
@@ -132,6 +143,8 @@ services:
     image: notifications
     build: ./notifications/
     restart: unless-stopped
+    networks:
+      - outer
 
   loms:
     image: loms
@@ -144,7 +157,6 @@ services:
     networks:
       - loms
       - outer
-
 
 networks:
   checkout:

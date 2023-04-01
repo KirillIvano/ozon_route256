@@ -1,2 +1,2 @@
-brokers: ["127.0.0.1:9091", "127.0.0.1:9092", "127.0.0.1:9093"]
 order_topic: order
+brokers: ["kafka:29091", "kafka1:29092", "kafka2:29093"]

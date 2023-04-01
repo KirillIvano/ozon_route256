@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -12,8 +13,8 @@ type ServicesConfig struct {
 }
 
 type ConfigStruct struct {
-	OrderTopic string         `omitempty,yaml:"order_topic"`
-	Brokers    []string       `omitempty,yaml:"brokers"`
+	OrderTopic string         `yaml:"order_topic"`
+	Brokers    []string       `yaml:"brokers"`
 	Services   ServicesConfig `yaml:"services"`
 	Port       int32          `omitempty,yaml:"port"`
 }
@@ -31,6 +32,8 @@ func Init() error {
 	if err != nil {
 		return errors.WithMessage(err, "parsing config file")
 	}
+
+	fmt.Println(ConfigData)
 
 	return nil
 }

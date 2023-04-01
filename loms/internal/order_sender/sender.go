@@ -56,5 +56,5 @@ func (s *orderSender) SendOrder(ctx context.Context, orderId int64, orderStatus 
 		return errors.Wrap(err, "failed to send message")
 	}
 
-	return err
+	return nil
 }
