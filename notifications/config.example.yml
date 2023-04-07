@@ -1,0 +1,2 @@
+order_topic: order
+brokers: ["kafka:29091", "kafka1:29092", "kafka2:29093"]

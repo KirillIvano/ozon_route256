@@ -45,6 +45,11 @@ func (m *LomsDomain) SetOrderPayed(ctx context.Context, orderId int64) error {
 		return m.SetOrderPayedTransaction(ctxTX, orderId)
 	})
 
+	err = m.orderSender.SendOrder(ctx, orderId, OrderStatusPayed)
+	if err != nil {
+		return errors.Wrap(err, "failed to send new order status")
+	}
+
 	if err != nil {
 		errors.Wrap(err, "pay order transaction failed")
 	}

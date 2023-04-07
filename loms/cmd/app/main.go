@@ -7,9 +7,11 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"route256/libs/kafka"
 	"route256/loms/internal/config"
 	"route256/loms/internal/domain"
 	lomsServer "route256/loms/internal/loms_server"
+	orderSender "route256/loms/internal/order_sender"
 	"route256/loms/internal/repository"
 	statusActualizer "route256/loms/internal/status_actualizer"
 	lomsService "route256/loms/pkg/loms_service"
@@ -70,8 +72,14 @@ func main() {
 	defer conn.Close()
 	log.Println("database connected successfully")
 
+	producer, err := kafka.NewSyncProducer(config.ConfigData.Brokers)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	orderSender := orderSender.NewOrderSender(producer, config.ConfigData.OrderTopic)
+
 	repository := repository.Connect(conn)
-	domain := domain.New(repository)
+	domain := domain.New(repository, orderSender)
 
 	enf := statusActualizer.New(ctx, domain)
 
