@@ -5,6 +5,8 @@ import (
 	lomsService "route256/loms/pkg/loms_service"
 
 	"github.com/pkg/errors"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -21,13 +23,13 @@ func ValidateListOrderParams(r *lomsService.ListOrderParams) error {
 
 func (impl *implementation) ListOrder(ctx context.Context, params *lomsService.ListOrderParams) (*lomsService.ListOrderResponse, error) {
 	if err := ValidateListOrderParams(params); err != nil {
-		return nil, err
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	orderInfo, err := impl.lomsDomain.ListOrder(ctx, params.OrderID)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "list order failed")
+		return nil, status.Error(codes.Internal, err.Error())
 	}
 
 	responseItems := make([]*lomsService.OrderItem, len(orderInfo.Items))

@@ -14,8 +14,11 @@ build: bindir
 test:
 	go test ./...
 
+dev:
+	go run ${PACKAGE} -devel=true
+
 run:
-	go run ${PACKAGE}
+	go run ${PACKAGE} -devel=false
 
 lint: install-lint
 	${LINTBIN} run

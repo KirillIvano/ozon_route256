@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/pkg/errors"
@@ -32,8 +31,6 @@ func Init() error {
 	if err != nil {
 		return errors.WithMessage(err, "parsing config file")
 	}
-
-	fmt.Println(ConfigData)
 
 	return nil
 }

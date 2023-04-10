@@ -2,7 +2,7 @@ package worker_pool
 
 import (
 	"context"
-	"log"
+	"route256/libs/logger"
 	"sync"
 )
 
@@ -19,10 +19,10 @@ type WorkerPool struct {
 
 // Закрывает пул, ожидая выполнения всей переданной работы
 func (w *WorkerPool) GracefulClose() {
-	log.Println("[worker_pool]: closing, waiting for incoming work to stop ")
+	logger.Info("[worker_pool]: closing, waiting for incoming work to stop ")
 	w.wgIn.Wait()
 
-	log.Println("[worker_pool]: closing, none work left, freeing channel")
+	logger.Info("[worker_pool]: closing, none work left, freeing channel")
 	close(w.workIn)
 }
 

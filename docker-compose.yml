@@ -160,8 +160,8 @@ services:
 
 networks:
   checkout:
-    driver: bridge
+    driver: host
   loms:
-    driver: bridge
+    driver: host
   outer:
-    driver: bridge
+    driver: host

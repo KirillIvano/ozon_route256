@@ -2,8 +2,10 @@ package status_actualizer
 
 import (
 	"context"
-	"log"
+	"route256/libs/logger"
 	"time"
+
+	"go.uber.org/zap"
 )
 
 type LomsDomain interface {
@@ -26,11 +28,11 @@ func (e *OrderStatusActualizer) Start() {
 			case <-e.ticker.C:
 				err := e.domain.ClearUnpaid(e.ctx)
 				if err != nil {
-					log.Print(err)
+					logger.Error("unpaid order failed to actualize", zap.Error(err))
 					break
 				}
 
-				log.Println("payments actualized")
+				logger.Info("payments actualized")
 			}
 		}
 	}()

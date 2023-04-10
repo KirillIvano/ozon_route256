@@ -2,10 +2,13 @@ package loms_client
 
 import (
 	"context"
-	"log"
 	"route256/checkout/internal/domain"
+	"route256/libs/logger"
 	lomsService "route256/loms/pkg/loms_service"
 
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
+	"github.com/opentracing/opentracing-go"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -25,9 +28,17 @@ type LomsClient interface {
 }
 
 func New(ctx context.Context, urlOrigin string) *Client {
-	conn, err := grpc.DialContext(ctx, urlOrigin, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	logger.Info(urlOrigin)
+
+	conn, err := grpc.DialContext(
+		ctx,
+		urlOrigin,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
+	)
+
 	if err != nil {
-		log.Fatalf("failed to connect to server: %v", err)
+		logger.Fatal("failed to connect to server: %v", zap.Error(err))
 	}
 
 	c := lomsService.NewLomsClient(conn)
