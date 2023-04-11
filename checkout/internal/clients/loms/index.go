@@ -28,8 +28,6 @@ type LomsClient interface {
 }
 
 func New(ctx context.Context, urlOrigin string) *Client {
-	logger.Info(urlOrigin)
-
 	conn, err := grpc.DialContext(
 		ctx,
 		urlOrigin,

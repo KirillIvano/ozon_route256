@@ -18,7 +18,9 @@ import (
 	"route256/libs/logger"
 	"route256/libs/tracing"
 
+	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -36,9 +38,10 @@ func startServer(ctx context.Context, businessLogic *domain.CheckoutDomain) *grp
 		logger.Fatal("failed to listen server", zap.Error(err))
 	}
 
-	tracing.Init("checkout_service")
-	handler := grpc.ChainUnaryInterceptor(logger.Interceptor, tracing.Interceptor)
-
+	handler := grpc.ChainUnaryInterceptor(
+		logger.Interceptor,
+		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
+	)
 	grpcServer := grpc.NewServer(handler)
 
 	checkoutService.RegisterCheckoutServer(grpcServer, checkoutServer.New(businessLogic))
@@ -73,6 +76,7 @@ func main() {
 	defer stopSignalListen()
 
 	logger.Init(*develMode)
+	tracing.Init("checkout_service")
 
 	wp := workerPool.New(ctx, 5)
 	defer wp.GracefulClose()

@@ -40,8 +40,6 @@ func startServer(ctx context.Context, businessLogic *domain.LomsDomain) {
 		logger.Fatal("failed to listen: ", zap.Error(err))
 	}
 
-	tracing.Init("loms_service")
-
 	handler := grpc.ChainUnaryInterceptor(
 		logger.Interceptor,
 		metrics.Interceptor,
@@ -99,6 +97,7 @@ func main() {
 	defer stopSignalListen()
 
 	logger.Init(*develMode)
+	tracing.Init("loms_service")
 
 	err := config.Init()
 	if err != nil {

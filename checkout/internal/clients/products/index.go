@@ -39,6 +39,7 @@ func New(ctx context.Context, urlOrigin string, token string) *client {
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
 	)
+
 	if err != nil {
 		logger.Fatal("failed to connect to server:", zap.Error(err))
 	}
