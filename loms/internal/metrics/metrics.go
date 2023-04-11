@@ -17,11 +17,11 @@ const (
 )
 
 var (
-	reqCounter = promauto.NewCounter(prometheus.CounterOpts{
+	reqCounter = promauto.NewCounterVec(prometheus.CounterOpts{
 		Namespace: namespace,
 		Subsystem: subsystem,
 		Name:      "requests_total",
-	})
+	}, []string{"method"})
 
 	goroutinesGauge = promauto.NewGauge(prometheus.GaugeOpts{
 		Namespace: namespace,
@@ -34,7 +34,7 @@ var (
 		Subsystem: subsystem,
 		Name:      "response_time",
 		Buckets:   prometheus.ExponentialBuckets(0.0001, 2, 16),
-	}, []string{"status"})
+	}, []string{"status", "method"})
 )
 
 type Metrics struct{}
