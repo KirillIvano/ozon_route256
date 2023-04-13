@@ -2,9 +2,10 @@ package domain
 
 import (
 	"context"
-	"log"
+	"route256/libs/logger"
 
 	"github.com/pkg/errors"
+	"go.uber.org/zap"
 )
 
 var (
@@ -15,17 +16,17 @@ func (m *LomsDomain) SetOrderPayedTransaction(ctx context.Context, orderId int64
 	if err := m.lomsRepository.ApplyOrderReservations(ctx, orderId); err != nil {
 		return errors.Wrap(err, "reservations apply failed")
 	}
-	log.Println("payment: applied reservations")
+	logger.Info("payment: applied reservations", zap.Int64("orderId", orderId))
 
 	if err := m.lomsRepository.ClearReservations(ctx, orderId); err != nil {
 		return errors.Wrap(err, "reservations clear failed")
 	}
-	log.Println("payment: cleared reservations")
+	logger.Info("payment: cleared reservations", zap.Int64("orderId", orderId))
 
 	if err := m.lomsRepository.UpdateOrderStatus(ctx, orderId, OrderStatusPayed); err != nil {
 		return errors.Wrap(err, "status update failed")
 	}
-	log.Println("payment: updated status")
+	logger.Info("payment: updated status", zap.Int64("orderId", orderId))
 
 	return nil
 }

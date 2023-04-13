@@ -64,3 +64,6 @@ precommit:
 	cd checkout && make precommit
 	cd loms && make precommit
 	cd notifications && make precommit
+
+run-infra:
+	docker compose up zookeeper kafka kafka1 kafka2 checkout_pg loms_pg

@@ -2,9 +2,10 @@ package order_consumer
 
 import (
 	"encoding/json"
-	"log"
+	"route256/libs/logger"
 
 	"github.com/Shopify/sarama"
+	"go.uber.org/zap"
 )
 
 type NotificationDomain interface {
@@ -49,14 +50,14 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 			err := json.Unmarshal(message.Value, &order)
 
 			if err != nil {
-				log.Printf("failed to parse order for key %s: %s\n", message.Key, err)
+				logger.Info("failed to parse order for key", zap.ByteString("message", message.Key), zap.Error(err))
 				session.MarkMessage(message, "")
 				break
 			}
 
 			err = consumer.domain.LogOrderStatus(order.Id, order.Status)
 			if err != nil {
-				log.Println("failed to log status")
+				logger.Info("failed to log status")
 				break
 			}
 

@@ -2,7 +2,6 @@ package domain
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/pkg/errors"
 )
@@ -41,10 +40,8 @@ func (m *CheckoutDomain) ListCart(ctx context.Context, userId uint32) (*ListCart
 	for idx, item := range items {
 		currentIdx, currentItem := idx, item
 
-		// нельзя мокать, иначе не закроются каналы))
 		m.wp.Run(func() {
 			product, err := m.productService.GetProduct(ctx, currentItem.Sku)
-			fmt.Printf("%s, kek", err)
 
 			if err != nil {
 				errChan <- err

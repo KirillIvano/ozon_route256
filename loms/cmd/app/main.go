@@ -2,79 +2,56 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
-	"log"
-	"net"
 	"os"
 	"os/signal"
 	"route256/libs/kafka"
+	"route256/libs/logger"
+	"route256/libs/tracing"
+	"route256/libs/universal_server"
 	"route256/loms/internal/config"
 	"route256/loms/internal/domain"
-	lomsServer "route256/loms/internal/loms_server"
+	"route256/loms/internal/loms_server"
 	orderSender "route256/loms/internal/order_sender"
 	"route256/loms/internal/repository"
 	statusActualizer "route256/loms/internal/status_actualizer"
-	lomsService "route256/loms/pkg/loms_service"
+	loms "route256/loms/pkg/loms_service"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
+	"go.uber.org/zap"
 )
 
-func startServer(ctx context.Context, businessLogic *domain.LomsDomain) {
-	netListener := net.ListenConfig{}
-	listener, err := netListener.Listen(ctx, "tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
-	if err != nil {
-		log.Fatal("failed to listen: ", err)
-	}
-
-	grpcServer := grpc.NewServer()
-	lomsService.RegisterLomsServer(grpcServer, lomsServer.New(businessLogic))
-	reflection.Register(grpcServer)
-
-	serverDone := make(chan struct{})
-	defer close(serverDone)
-
-	go func() {
-		defer func() { serverDone <- struct{}{} }()
-
-		if err := grpcServer.Serve(listener); err != nil {
-			log.Fatal("failed to serve: ", err)
-		}
-	}()
-
-	// ждем закрытия окончания работы сервера
-	for {
-		select {
-		case <-serverDone:
-			return
-		case <-ctx.Done():
-			grpcServer.GracefulStop()
-		}
-	}
-}
+var (
+	metricAddr = flag.String("addr", ":9081", "the port to listen")
+	develMode  = flag.Bool("devel", false, "development mode")
+)
 
 func main() {
 	ctx := context.Background()
 	ctx, stopSignalListen := signal.NotifyContext(ctx, os.Interrupt)
 	defer stopSignalListen()
 
+	logger.Init(*develMode)
+	tracing.Init("loms")
+
 	err := config.Init()
 	if err != nil {
 		fmt.Println(err)
-		log.Fatal("config init failed")
+		logger.Fatal("config init failed", zap.Error(err))
 	}
 
 	conn, err := pgxpool.New(ctx, config.ConfigData.Services.Database)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("pool connection error", zap.Error(err))
 	}
 	defer conn.Close()
-	log.Println("database connected successfully")
+
+	logger.Info("database connected successfully")
 
 	producer, err := kafka.NewSyncProducer(config.ConfigData.Brokers)
 	if err != nil {
-		log.Fatalln(err)
+		logger.Fatal("kafka connection failed", zap.Error(err))
 	}
 	orderSender := orderSender.NewOrderSender(producer, config.ConfigData.OrderTopic)
 
@@ -86,5 +63,9 @@ func main() {
 	enf.Start()
 	defer enf.Close()
 
-	startServer(ctx, domain)
+	server := universal_server.New("loms", config.ConfigData.Port, *metricAddr)
+
+	loms.RegisterLomsServer(server.GetServerRegistrar(), loms_server.New(domain))
+
+	server.Listen(ctx)
 }

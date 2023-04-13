@@ -11,6 +11,5 @@ func (m *LomsDomain) ListOrder(ctx context.Context, orderId int64) (*OrderInfo, 
 		return nil, err
 	}
 
-	// return content of single order
 	return order, nil
 }

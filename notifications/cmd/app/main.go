@@ -2,25 +2,26 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
 
+	"route256/libs/logger"
 	"route256/notifications/internal/config"
 	"route256/notifications/internal/domain"
 	"route256/notifications/internal/order_consumer"
 
 	"github.com/Shopify/sarama"
+	"go.uber.org/zap"
 )
 
 func main() {
+	logger.Init(false)
+
 	err := config.Init()
 	if err != nil {
-		fmt.Println(err)
-		log.Fatal("config init failed")
+		logger.Fatal("config init failed", zap.Error(err))
 	}
 
 	keepRunning := true
@@ -38,7 +39,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	client, err := sarama.NewConsumerGroup(config.ConfigData.Brokers, groupName, kafkaConfig)
 	if err != nil {
-		log.Panicf("Error creating consumer group client: %v", err)
+		logger.Fatal("Error creating consumer group client", zap.Error(err))
 	}
 
 	consumptionIsPaused := false
@@ -48,7 +49,8 @@ func main() {
 		defer wg.Done()
 		for {
 			if err := client.Consume(ctx, []string{config.ConfigData.OrderTopic}, &consumer); err != nil {
-				log.Panicf("Error from consumer: %v", err)
+				logger.Fatal("Error from consumer", zap.Error(err))
+
 			}
 			// check if context was cancelled, signaling that the consumer should stop
 			if ctx.Err() != nil {
@@ -58,7 +60,7 @@ func main() {
 	}()
 
 	<-consumer.Ready()
-	log.Println("Sarama consumer up and running!...")
+	logger.Info("Sarama consumer up and running!...")
 
 	sigusr1 := make(chan os.Signal, 1)
 	signal.Notify(sigusr1, syscall.SIGUSR1)
@@ -69,10 +71,10 @@ func main() {
 	for keepRunning {
 		select {
 		case <-ctx.Done():
-			log.Println("terminating: context cancelled")
+			logger.Info("terminating: context cancelled")
 			keepRunning = false
 		case <-sigterm:
-			log.Println("terminating: via signal")
+			logger.Info("terminating: via signal")
 			keepRunning = false
 		case <-sigusr1:
 			toggleConsumptionFlow(client, &consumptionIsPaused)
@@ -82,17 +84,17 @@ func main() {
 	cancel()
 	wg.Wait()
 	if err = client.Close(); err != nil {
-		log.Panicf("Error closing client: %v", err)
+		logger.Fatal("Error closing client", zap.Error(err))
 	}
 }
 
 func toggleConsumptionFlow(client sarama.ConsumerGroup, isPaused *bool) {
 	if *isPaused {
 		client.ResumeAll()
-		log.Println("Resuming consumption")
+		logger.Info("Resuming consumption")
 	} else {
 		client.PauseAll()
-		log.Println("Pausing consumption")
+		logger.Info("Pausing consumption")
 	}
 
 	*isPaused = !*isPaused

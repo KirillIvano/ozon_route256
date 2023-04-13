@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"log"
-	"net"
+	"flag"
 	"os"
 	"os/signal"
 	checkoutServer "route256/checkout/internal/checkout_server"
@@ -15,45 +13,17 @@ import (
 	"route256/checkout/internal/repository"
 	checkoutService "route256/checkout/pkg/checkout_service"
 	workerPool "route256/checkout/pkg/worker_pool"
+	"route256/libs/logger"
+	"route256/libs/tracing"
+	"route256/libs/universal_server"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
-func startServer(ctx context.Context, businessLogic *domain.CheckoutDomain) *grpc.Server {
-	netListener := net.ListenConfig{}
-	listener, err := netListener.Listen(ctx, "tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
-	if err != nil {
-		log.Fatal("failed to listen: ", err)
-	}
-
-	grpcServer := grpc.NewServer()
-
-	checkoutService.RegisterCheckoutServer(grpcServer, checkoutServer.New(businessLogic))
-	reflection.Register(grpcServer)
-
-	serverDone := make(chan struct{})
-	defer close(serverDone)
-
-	go func() {
-		defer func() { serverDone <- struct{}{} }()
-
-		if err := grpcServer.Serve(listener); err != nil {
-			log.Fatal("failed to serve: ", err)
-		}
-	}()
-
-	// ждем закрытия окончания работы сервера
-	for {
-		select {
-		case <-serverDone:
-			return grpcServer
-		case <-ctx.Done():
-			grpcServer.GracefulStop()
-		}
-	}
-}
+var (
+	metricAddr = flag.String("addr", ":9080", "the port to listen")
+	develMode  = flag.Bool("devel", false, "development mode")
+)
 
 func main() {
 	ctx := context.Background()
@@ -61,22 +31,25 @@ func main() {
 	ctx, stopSignalListen := signal.NotifyContext(ctx, os.Interrupt)
 	defer stopSignalListen()
 
+	logger.Init(*develMode)
+	tracing.Init("checkout")
+
 	wp := workerPool.New(ctx, 5)
 	defer wp.GracefulClose()
 
 	err := config.Init()
 	if err != nil {
-		log.Fatal("config init failed")
+		logger.Fatal("config init failed")
 	}
 
 	dbConfig, err := pgxpool.ParseConfig(config.ConfigData.Services.Database)
 	if err != nil {
-		log.Fatal("database config parse failed")
+		logger.Fatal("database config parse failed")
 	}
 
 	conn, err := pgxpool.NewWithConfig(ctx, dbConfig)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal("pool init failed")
 	}
 	defer conn.Close()
 
@@ -90,5 +63,9 @@ func main() {
 
 	businessLogic := domain.New(lomsClient, productClient, repository, wp)
 
-	startServer(ctx, businessLogic)
+	server := universal_server.New("checkout", config.ConfigData.Port, *metricAddr)
+
+	checkoutService.RegisterCheckoutServer(server.GetServerRegistrar(), checkoutServer.New(businessLogic))
+
+	server.Listen(ctx)
 }

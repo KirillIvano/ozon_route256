@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"route256/loms/internal/domain"
 	"route256/loms/internal/repository/schema"
 
@@ -22,8 +21,6 @@ func (r repository) ListStocks(ctx context.Context, sku uint32) ([]domain.Stock,
 		GroupBy("warehouse_items.warehouse_id", "warehouse_items.sku").
 		PlaceholderFormat(sq.Dollar).
 		ToSql()
-
-	log.Println(query, args)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "formatting list stocks query failed")

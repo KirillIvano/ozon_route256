@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 2s
+  scrape_timeout: 2s
+  evaluation_interval: 1s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+  - job_name: "app"
+    static_configs:
+      - targets: 
+        - "host.docker.internal:9081"
+        - "host.docker.internal:9080"
+
+rule_files:
+  - "alert-groups.yml"
+
+alerting:
+  alertmanagers:
+  - scheme: http
+    static_configs:
+    - targets:
+      - "host.docker.internal:9093"
+
