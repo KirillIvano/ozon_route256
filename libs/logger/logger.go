@@ -1,11 +1,7 @@
 package logger
 
 import (
-	"context"
-	"net/http"
-
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
 )
 
 var globalLogger *zap.Logger
@@ -31,24 +27,6 @@ func New(devel bool) *zap.Logger {
 	}
 
 	return logger
-}
-
-func Middleware(logger *zap.Logger, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		logger.Debug(
-			"incoming http request",
-			zap.String("path", r.URL.Path),
-			zap.String("query", r.URL.RawQuery),
-		)
-
-		next.ServeHTTP(w, r)
-	})
-}
-
-func Interceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-	Info("incoming grpc request", zap.String("method", info.FullMethod))
-
-	return handler(ctx, req)
 }
 
 func Debug(msg string, fields ...zap.Field) {

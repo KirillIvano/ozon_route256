@@ -1,11 +1,11 @@
-groups:
-- name: alerts
-  rules:
-  - alert: TargetIsDown
-    expr: up == 0
-    for: 30s
-    labels:
-      severity: medium
-    annotations:
-      summary: "The target {{ $labels.job }} is down"
-      description: "Instance {{ $labels.instance }} of job {{ $labels.job }} has been down for more than 30 seconds."
+route:
+  group_by: ['alertname', 'instance', 'severity']
+  receiver: 'telegram'
+
+receivers:
+  - name: 'telegram'
+    telegram_configs:
+      - bot_token: '1356898071:AAE3ukUU1E1EG_d-o6_Es-U8FTjJoVottNo'
+        api_url: https://api.telegram.org
+        chat_id: 445933600
+        parse_mode: ''

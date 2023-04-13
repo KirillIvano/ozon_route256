@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"net"
 	"os"
 	"os/signal"
 	checkoutServer "route256/checkout/internal/checkout_server"
@@ -17,57 +15,15 @@ import (
 	workerPool "route256/checkout/pkg/worker_pool"
 	"route256/libs/logger"
 	"route256/libs/tracing"
+	"route256/libs/universal_server"
 
-	"github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/opentracing/opentracing-go"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 var (
 	metricAddr = flag.String("addr", ":9080", "the port to listen")
 	develMode  = flag.Bool("devel", false, "development mode")
 )
-
-func startServer(ctx context.Context, businessLogic *domain.CheckoutDomain) *grpc.Server {
-	netListener := net.ListenConfig{}
-	listener, err := netListener.Listen(ctx, "tcp", fmt.Sprintf(":%d", config.ConfigData.Port))
-	if err != nil {
-		logger.Fatal("failed to listen server", zap.Error(err))
-	}
-
-	handler := grpc.ChainUnaryInterceptor(
-		logger.Interceptor,
-		otgrpc.OpenTracingServerInterceptor(opentracing.GlobalTracer()),
-	)
-	grpcServer := grpc.NewServer(handler)
-
-	checkoutService.RegisterCheckoutServer(grpcServer, checkoutServer.New(businessLogic))
-	reflection.Register(grpcServer)
-
-	serverDone := make(chan struct{})
-	defer close(serverDone)
-
-	go func() {
-		defer func() { serverDone <- struct{}{} }()
-
-		if err := grpcServer.Serve(listener); err != nil {
-			logger.Fatal("failed to serve", zap.Error(err))
-		}
-	}()
-
-	// ждем закрытия окончания работы сервера
-	for {
-		select {
-		case <-serverDone:
-			return grpcServer
-		case <-ctx.Done():
-			grpcServer.GracefulStop()
-		}
-	}
-}
 
 func main() {
 	ctx := context.Background()
@@ -76,7 +32,7 @@ func main() {
 	defer stopSignalListen()
 
 	logger.Init(*develMode)
-	tracing.Init("checkout_service")
+	tracing.Init("checkout")
 
 	wp := workerPool.New(ctx, 5)
 	defer wp.GracefulClose()
@@ -107,5 +63,9 @@ func main() {
 
 	businessLogic := domain.New(lomsClient, productClient, repository, wp)
 
-	startServer(ctx, businessLogic)
+	server := universal_server.New("checkout", config.ConfigData.Port, *metricAddr)
+
+	checkoutService.RegisterCheckoutServer(server.GetServerRegistrar(), checkoutServer.New(businessLogic))
+
+	server.Listen(ctx)
 }

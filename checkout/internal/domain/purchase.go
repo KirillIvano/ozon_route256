@@ -3,10 +3,14 @@ package domain
 import (
 	"context"
 
+	"github.com/opentracing/opentracing-go"
 	"github.com/pkg/errors"
 )
 
 func (m *CheckoutDomain) Purchase(ctx context.Context, userId int64) (int64, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "purchase")
+	defer span.Finish()
+
 	items, err := m.repository.GetCartItems(ctx, int64(userId))
 	if err != nil {
 		return 0, errors.Wrap(err, "getting items from database")

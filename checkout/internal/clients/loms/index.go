@@ -28,8 +28,7 @@ type LomsClient interface {
 }
 
 func New(ctx context.Context, urlOrigin string) *Client {
-	conn, err := grpc.DialContext(
-		ctx,
+	conn, err := grpc.Dial(
 		urlOrigin,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(otgrpc.OpenTracingClientInterceptor(opentracing.GlobalTracer())),
