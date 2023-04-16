@@ -126,6 +126,34 @@ func TestCache(t *testing.T) {
 		require.Equal(t, int32(23), second.value)
 	})
 
+	t.Run("ttl works", func(t *testing.T) {
+		t.Parallel()
+
+		c := cache.NewCache[C](time.Second)
+
+		values := []C{
+			{key: "21", value: 21},
+			{key: "22", value: 22},
+			{key: "23", value: 23},
+		}
+
+		for _, v := range values {
+			c.AddToCache(v.key, v)
+		}
+
+		time.Sleep(time.Second * 2)
+
+		c.AddToCache("23", C{key: "23", value: 24})
+
+		var expected *C
+		a1, _ := c.GetFromCache("21")
+		a2, _ := c.GetFromCache("22")
+		a3, _ := c.GetFromCache("23")
+
+		require.Equal(t, expected, a1)
+		require.Equal(t, expected, a2)
+		require.Equal(t, int32(24), a3.value)
+	})
 }
 
 func createCache(cnt int) *cache.Cache[C] {

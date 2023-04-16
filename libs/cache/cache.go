@@ -33,15 +33,38 @@ type Bucket[T any] struct {
 	storage map[int32]*list.List
 }
 
+func (bucket *Bucket[T]) clearOutdated() {
+	now := time.Now()
+
+	bucket.mx.Lock()
+	defer bucket.mx.Unlock()
+
+	// run over bucket entries
+	for _, val := range bucket.storage {
+		// if entry is empty, skip it
+		if val == nil {
+			continue
+		}
+
+		// iterate over entry elements
+		for curr := val.Front(); curr != nil; curr = curr.Next() {
+			currentValue := curr.Value.(CacheEntry[T])
+
+			// if element is outdated, remove it from the list
+			if now.After(currentValue.deadline) {
+				val.Remove(curr)
+			}
+		}
+	}
+}
+
 func (bucket *Bucket[T]) findElementInStorage(key string, hash int32) *list.Element {
 	list := bucket.storage[hash]
 	if list == nil {
 		return nil
 	}
 
-	elements := list.Front()
-
-	for element := elements; element != nil; element = elements.Next() {
+	for element := list.Front(); element != nil; element = element.Next() {
 		val := element.Value.(CacheEntry[T])
 
 		if val.key == key {
@@ -125,6 +148,18 @@ func (cache *Cache[T]) GetFromCache(key string) (*T, bool) {
 	return val.value, true
 }
 
+func (cache *Cache[T]) executeTTL() {
+	go func() {
+		for {
+			time.Sleep(500 * time.Millisecond)
+
+			for _, bucket := range cache.buckets {
+				bucket.clearOutdated()
+			}
+		}
+	}()
+}
+
 func NewCache[T any](ttl time.Duration) *Cache[T] {
 	buckets := make([]Bucket[T], bucketsCount)
 
@@ -136,9 +171,13 @@ func NewCache[T any](ttl time.Duration) *Cache[T] {
 		}
 	}
 
-	return &Cache[T]{
+	cache := &Cache[T]{
 		buckets:    buckets,
 		bucketsCnt: bucketsCount,
 		ttl:        ttl,
 	}
+
+	cache.executeTTL()
+
+	return cache
 }
