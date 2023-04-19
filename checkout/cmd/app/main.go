@@ -14,7 +14,6 @@ import (
 	checkoutService "route256/checkout/pkg/checkout_service"
 	workerPool "route256/checkout/pkg/worker_pool"
 	"route256/libs/logger"
-	"route256/libs/tracing"
 	"route256/libs/universal_server"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,7 +31,6 @@ func main() {
 	defer stopSignalListen()
 
 	logger.Init(*develMode)
-	tracing.Init("checkout")
 
 	wp := workerPool.New(ctx, 5)
 	defer wp.GracefulClose()
